@@ -4,7 +4,7 @@
     "slug": "BlogApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "",
+    "icon": "assets/images/blog.png",
     "scheme": "blogapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "",
+        "foregroundImage": "assets/images/blog.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
@@ -21,7 +21,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": ""
+      "favicon": "assets/images/blog.png"
     },
     "plugins": [
       "expo-router",

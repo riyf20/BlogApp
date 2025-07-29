@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 
-const useFetch = <T>(url: string, method = 'GET') => {
+const useFetch = <T>(url: string, method = 'GET', autoFetch=true) => {
     
     const [data, setData] = useState<T | null>(null);    
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null)    
     
-    useEffect(() => {  
+    // useEffect(() => {  
+    const fetchData = () => {
 
+        // console.log("Fetch called")
         const abortCont = new AbortController();
 
             fetch(url, {method, signal: abortCont.signal})
@@ -33,9 +35,22 @@ const useFetch = <T>(url: string, method = 'GET') => {
 
         return () => abortCont.abort();
 
-    }, [url, method]);
+    }
+    // , [url, method]);
 
-    return {data, isLoading, error}
+    const reset = () => {
+        setData(null);
+        setIsLoading(false);
+        setError(null);
+    }
+
+    useEffect(() => {
+        if(autoFetch) {
+            fetchData();
+        }
+    }, [])
+
+    return {data, isLoading, error, refetch: fetchData, reset}
 }
 
 export default useFetch;
