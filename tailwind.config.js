@@ -7,6 +7,7 @@ module.exports = {
         colors: {
           primary: "#008B8B",       // Deep teal for headers, main identity
           secondary: "#2F4858",     // Muted blue-gray for text/buttons
+          secondaryLight: '#5C7082',
           light: {
             100: "#E0F7F7",         // Lightest background, input fields, cards
             200: "#BFEAEA",         // Hover states or secondary highlights

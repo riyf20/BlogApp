@@ -17,5 +17,5 @@
     "app/_layout.tsx",
     "nativewind-env.d.ts",
     "types/**/*.d.ts"
-  ]
+, "gluestack-ui.config.ts"  ]
 }
