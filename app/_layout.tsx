@@ -29,7 +29,7 @@ export default function RootLayout() {
           {/* Will redirect users to log in | sign up if they are not loggedin */}
           <Stack.Protected guard={!isLoggedin}>
             <Stack.Screen name="sign-in" options={{ headerShown: false }} />
-            <Stack.Screen name="sign-up" options={{ headerShown: false }} />
+            <Stack.Screen name="sign-up" options={{ headerShown: false }} /> 
           </Stack.Protected>
           
         </Stack>

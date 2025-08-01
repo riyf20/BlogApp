@@ -15,3 +15,10 @@ interface Picture {
     created_at: string;
     updated_at: string;
 }
+
+interface User {
+    id: number;
+    isGuest: boolean;
+    role: string;
+    username: string;
+}

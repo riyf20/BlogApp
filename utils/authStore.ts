@@ -4,10 +4,21 @@ import {getItem, setItem, deleteItemAsync} from "expo-secure-store"
 
 // This defines the states that will be saved
 type UserState = {
+    token: string;
+    user: User;
+    username: string;
+
     isLoggedin: boolean;
     shouldCreateAccount: boolean;
-    logIn: () => void;
+
+    logIn: ({token, user, username}:logInProps) => void;
     logOut: () => void;
+}
+
+type logInProps = {
+    token:string, 
+    user:User, 
+    username:string,
 }
 
 // Export the hook, takes an arrow function that returns as object with each of the keys in our state
@@ -19,11 +30,23 @@ export const useAuthStore = create(
         <UserState>((set) => ({
         isLoggedin: false,
         shouldCreateAccount: false,
-        logIn: () => {
+        token: '',
+        user: {
+            id:0, 
+            isGuest: false, 
+            role:'', 
+            username:''
+        },
+        username: '',
+        logIn: ({token, user, username}:logInProps) => {
             set((state) => {
                 return {
                     ...state,
                     isLoggedin: true,
+                    shouldCreateAccount: false,
+                    token,
+                    user,
+                    username,
                 }
             })
         },
@@ -32,13 +55,22 @@ export const useAuthStore = create(
                 return {
                     ...state,
                     isLoggedin: false,
+                    shouldCreateAccount: false,
+                    token: '',
+                    user: {
+                        id:0, 
+                        isGuest: false, 
+                        role:'', 
+                        username:''
+                    },
+                    username: '',
                 }
             })
         }
         }),
    
     // second argument is where we are storing it
-        {
+    {
         name: "auth-store",
         storage: createJSONStorage(() => ({
             setItem, 
