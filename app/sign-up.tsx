@@ -147,7 +147,7 @@ const signUp = () => {
         }
 
         <Button 
-            size="md" variant="solid" action="primary" onPress={handleSignUp} 
+            size="md" variant="solid" bg='#47a7a7' onPress={handleSignUp} 
         >
           <Text className="font-bold text-xl" color='$white' size='lg'>Sign Up</Text>
         </Button>

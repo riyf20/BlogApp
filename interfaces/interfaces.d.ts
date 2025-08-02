@@ -22,3 +22,29 @@ interface User {
     role: string;
     username: string;
 }
+
+interface UserProfile {
+    email: string;
+    first_name: string;
+    id: number;
+    last_name: string;
+    password_txt: string;
+    username: string;
+};
+
+interface InfoModal {
+    showModal: boolean,
+    setShowModal: (boolean) => void,
+    heading: string,
+    body: string,
+    buttonText: string,
+    parent: string,
+    confirmFunction: () => void,
+}
+
+interface ProfileInputProps {
+    title: string, 
+    disabled: boolean, 
+    userInput: string, 
+    setInput: (arg0: string) => void;
+}

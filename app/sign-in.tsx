@@ -4,9 +4,12 @@ import { useAuthStore } from '@/utils/authStore'
 import { Link, router } from 'expo-router';
 import { Button, Heading, Text, FormControl, 
     FormControlErrorText, FormControlErrorIcon, 
-    AlertCircleIcon, FormControlError, Divider} from '@gluestack-ui/themed';
-import { loginUser } from '@/services/auth';
+    AlertCircleIcon, FormControlError, Divider,
+    ButtonText,
+} from '@gluestack-ui/themed';
+import { loginGuestUser, loginUser } from '@/services/auth';
 import FormInput from '@/components/FormInput';
+import InfoModal from '@/components/InfoModal';
 
 
 const signIn = () => {
@@ -27,6 +30,8 @@ const signIn = () => {
     // Error message for parent form or username/password
     const [error, setError] = useState('');
 
+    // Dynamic modal to confirm actions
+    const [showModal, setShowModal] = useState(false);
 
     const handleLogin = async () => {
 
@@ -76,11 +81,28 @@ const signIn = () => {
         }
     };
 
+    const handleGuestMode = async () => {
 
+        // Attempts to guest login 
+        try {
+            const data = await loginGuestUser();
+
+            // Saves data to the backend Auth for persistant state
+            logIn({
+                token: data.token,
+                user: data.user,
+                username: 'guest', 
+            });
+
+        } catch (err: any) {
+            // Catches messages from backend and any other errors
+            setError('An unexpected error occurred');
+        }
+    }
 
     return (
 
-        <View className='flex-1 justify-center items-center bg-dark-100'>
+        <View className='flex-1 justify-center items-center bg-dark-200'>
 
             <FormControl className="p-4 border border-transparent rounded-xl bg-secondaryLight w-[80%] gap-6 pb-10"
                 isInvalid={invalid}
@@ -106,7 +128,7 @@ const signIn = () => {
                 }
 
                 <Button 
-                    size="md" variant="solid" action="primary" onPress={handleLogin} 
+                    size="md" variant="solid" bg='#47a7a7' onPress={handleLogin}
                 >
                     <Text className="font-bold text-xl" color='$white' size='lg'>Sign in</Text>
                 </Button>
@@ -123,7 +145,16 @@ const signIn = () => {
                 
             </FormControl>
 
-            
+            {/* Guest mode block */}
+            <View className='p-4 border border-transparent rounded-xl bg-secondaryLight w-[80%] gap-2 mt-10 items-center'>
+                <Text color='$white' bold={true} >Try the new Guest mode!</Text>
+                <Button onPress={() => setShowModal(true)} bg='#1C2B33'>
+                    <ButtonText>Guest Mode</ButtonText>
+                </Button>
+                
+                <InfoModal showModal={showModal} setShowModal={setShowModal} heading={'Guest Mode'} body={"Don't want to make an account yet? Guest mode allows you toexperience what the app has to offer without a commitment."} buttonText={'Enter'} parent='signin' confirmFunction={handleGuestMode}/>
+
+            </View>
         </View>
 
     )

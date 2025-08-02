@@ -18,7 +18,7 @@ export default function Index() {
     // Acts like a header for main page
     <View className="flex-1 bg-dark-100">
 
-      <View className="justify-center items-center flex-row mt-20 px-4 mb-4">
+      <View className="justify-center items-center flex-row mt-16 px-4 mb-4">
         <Image
           source={images.logo}
             className="w-10 h-10"
@@ -72,11 +72,7 @@ export default function Index() {
               </>
             )}
 
-              
-
-              
           </View>
-
 
         </ScrollView>
 
