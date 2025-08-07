@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '@/utils/authStore';
 import {Button, ButtonIcon, Divider, EditIcon, 
   FormControl, Text } from '@gluestack-ui/themed';
-import { refreshExpiredToken, updateUserData, userData } from '@/services/auth';
+import { clearRefreshToken, refreshExpiredToken, updateUserData, userData } from '@/services/auth';
 import ProfileInput from '@/components/ProfileInput';
 import InfoModal from '@/components/InfoModal';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { clearRefreshTimeout } from '@/utils/authUtils';
 
 
 const profile = () => {
@@ -26,6 +27,7 @@ const profile = () => {
   const [emailInput, setEmailInput] = useState('');
   const [userID, setUserID] = useState(-1);
 
+  // Input field's validity
   const [userInvalid, setUserInvalid] = useState(false);
   const [passInvalid, setPassInvalid] = useState(false);
   const [firstInvalid, setFirstInvalid] = useState(false);
@@ -44,27 +46,8 @@ const profile = () => {
   const [buttonText, setButtonText] = useState('');
   const [parent, setParent] = useState('');
 
+  // If any input fields were altered
   const [altered, setAltered] = useState(false);
-
-  const [tokenExpired, setTokenExpired] = useState(false);
-
-  // Refreshes token if expired
-  useEffect(() => {
-    const expiredToken = async () => {
-      if(userID > 0) {
-        try {
-          const data = await refreshExpiredToken(refreshToken, userID, username); 
-
-          changeToken(data.newToken)
-
-        } catch (err: any) {
-          console.error('Fetch error:', err.message);
-        }
-      }
-      
-    }
-    expiredToken()
-  }, [tokenExpired])
   
   // Fetches profile data from database
   useEffect(() => {
@@ -167,7 +150,6 @@ const profile = () => {
     // Formats data to be sent to backend
     const newdata = {fName:firstInput, lName:lastInput, userName:userInput, email:emailInput, password:passInput}
 
-    // FOCUS HERE
     try {
       const data = await updateUserData(username, userID, token, newdata); 
 
@@ -185,15 +167,7 @@ const profile = () => {
       setDisabled(true);
 
     } catch (err: any) {
-
-      if(err.message==='Invalid token') {
-        // Catches invalid tokens
-        setDisabled(true)
-        setTokenExpired(true);
-      } else {
-        setError(`An unexpected error occurred: ${err.message}`);
-      }
-      
+      setError(`An unexpected error occurred: ${err.message}`);      
     }
 
   }
@@ -218,6 +192,14 @@ const profile = () => {
     setShowModal(true)
   }
 
+  // Does clean up on logout
+  // Clears timer --> Removes Refresh token from database --> logouts
+  const handleLogOut = () => {
+    clearRefreshTimeout();
+    clearRefreshToken(refreshToken, userID, token);
+    logOut();
+  }
+
   return (
 
     // Acts like a header for the page
@@ -236,7 +218,7 @@ const profile = () => {
             alignItems:"center",
             paddingBottom: 200,
           }}
-            showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           >
 
           {/* Profile / Account credentials section */}
@@ -287,7 +269,7 @@ const profile = () => {
             }
             
             {/* Modal component */}
-            <InfoModal showModal={showModal} setShowModal={setShowModal} heading={heading} body={body} buttonText={buttonText} parent={'profile'} confirmFunction={parent=='profile' ? handleSaveChanges : logOut}/>
+            <InfoModal showModal={showModal} setShowModal={setShowModal} heading={heading} body={body} buttonText={buttonText} parent={'profile'} confirmFunction={parent=='profile' ? handleSaveChanges : handleLogOut}/>
 
           </FormControl>
 
@@ -303,14 +285,8 @@ const profile = () => {
           </View>
           
         </ScrollView>
-
       </View>
-
-
-    </View>
-
-        
-    
+    </View>    
   )
 }
 

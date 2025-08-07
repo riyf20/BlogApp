@@ -36,7 +36,7 @@ export const useAuthStore = create(
         shouldCreateAccount: false,
         token: '',
         user: {
-            id:0, 
+            id:-1, 
             isGuest: false, 
             role:'', 
             username:''
@@ -64,7 +64,7 @@ export const useAuthStore = create(
                     shouldCreateAccount: false,
                     token: '',
                     user: {
-                        id:0, 
+                        id:-1, 
                         isGuest: false, 
                         role:'', 
                         username:''

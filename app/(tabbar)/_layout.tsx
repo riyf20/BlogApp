@@ -1,13 +1,13 @@
 import { Tabs } from "expo-router";
-import { ImageBackground, Image, Text, View } from "react-native";
+import { ImageBackground, Text, View } from "react-native";
 import {Feather, AntDesign} from '@expo/vector-icons';
 import { images } from "@/constants/images";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-// for the tab bar at the bottom
+// For the tab bar at the bottom
 function TabIcon({ focused, icon, title }: any) {
 
-  // if it on that page will put background behind it
+  // If tab is focused --> will put background behind it
   if (focused) {
     return (
       <ImageBackground
@@ -24,7 +24,7 @@ function TabIcon({ focused, icon, title }: any) {
     );
   }
 
-  // otherwise basic tab bar 
+  // Else no background | basic tab bar 
   return (
     <View className="size-full justify-center items-center mt-4 rounded-full">
       {icon}
@@ -57,12 +57,12 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        // name must match the file that is corresponding to it  
+        // "Name" must match the file that is corresponding to it  
         name="index"
         options={{
+          // "Title" will be name of page | "Header" toggles its visibility
           title: "Blogs",
           headerShown: false,
-          // title is name of page and header will toggle its visibility
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} icon={<Feather name="home" size={24} color="white" />} title="Home" />
           ),

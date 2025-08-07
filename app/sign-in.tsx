@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native'
 import React, { useState } from 'react'
 import { useAuthStore } from '@/utils/authStore'
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { Button, Heading, Text, FormControl, 
     FormControlErrorText, FormControlErrorIcon, 
     AlertCircleIcon, FormControlError, Divider,
@@ -10,7 +10,7 @@ import { Button, Heading, Text, FormControl,
 import { loginGuestUser, loginUser } from '@/services/auth';
 import FormInput from '@/components/FormInput';
 import InfoModal from '@/components/InfoModal';
-
+import { scheduleTokenRefresh } from '@/utils/authUtils';
 
 const signIn = () => {
     
@@ -60,7 +60,6 @@ const signIn = () => {
         try {
             const data = await loginUser(username, password);
 
-            console.log("refresh = ", data.refreshToken)
             // Saves data to the backend Auth for persistant state
             logIn({
                 token: data.token,
@@ -68,6 +67,8 @@ const signIn = () => {
                 username: data.username, 
                 refreshToken: data.refreshToken,
             });
+            // Sets timeout on log in
+            scheduleTokenRefresh(data.token); 
 
         } catch (err: any) {
             // Catches messages from backend and any other errors

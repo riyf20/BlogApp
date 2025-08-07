@@ -79,7 +79,7 @@ export const userCommentData = async (username: string, token:string) => {
     }
   })
   const data = await response.json();
-  if (!response.ok) throw new Error(data.message || 'Blog data fetch failed');
+  if (!response.ok) throw new Error(data.message || 'Comment data fetch failed');
   // console.log(data)
   return data;
 };
@@ -110,7 +110,21 @@ export const refreshExpiredToken = async (refreshToken:string, userID:number, us
     body: JSON.stringify({refreshToken, userID, username})
   })
   const data = await response.json();
-  if (!response.ok) throw new Error(data.message || 'Blog data fetch failed');
+  if (!response.ok) throw new Error(data.message || 'Refresh Token Failed');
   // console.log(data)
+  return data;
+}
+
+export const clearRefreshToken = async (refreshToken:string, userID:number, token:string) => {
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/refreshtoken/delete`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({refreshToken, userID})
+  })
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Deleting refresh Token failed');
   return data;
 }

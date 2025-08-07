@@ -7,6 +7,7 @@ import FormInput from '@/components/FormInput';
 import { useRouter } from 'expo-router';
 import { loginUser, signupUser } from '@/services/auth';
 import { useAuthStore } from '@/utils/authStore'
+import { scheduleTokenRefresh } from '@/utils/authUtils';
 
 
 
@@ -90,11 +91,13 @@ const signUp = () => {
 
           // Saves data to the backend Auth for persistant state
           logIn({
-              token: data.token,
-              user: data.user,
-              username: data.username, 
-              refreshToken: data.refreshToken,
+            token: data.token,
+            user: data.user,
+            username: data.username, 
+            refreshToken: data.refreshToken,
           });
+          // Sets timeout on log in
+          scheduleTokenRefresh(data.token);
 
         } catch (err: any) {
 

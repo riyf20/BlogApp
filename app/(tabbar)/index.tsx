@@ -1,18 +1,21 @@
-import { ActivityIndicator, FlatList, Image, RefreshControl, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Image, RefreshControl, ScrollView, Text, View } from "react-native";
 import { images } from "@/constants/images";
 import useFetch from "@/services/useFetch";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import BlogCard from "@/components/BlogCard";
+import { useAppRefresh } from "@/utils/useAppRefresh";
 
 
 export default function Index() {
 
-  // grab the data | all blogs
+  // Grabs the data | all blogs
   const {data: blogs, isLoading, error, refetch: fetchData, reset} = useFetch<Blog[]>(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs`); 
 
   const [refreshing, setRefreshing] = useState(false);
-  
 
+  // Refreshes token 
+  useAppRefresh();
+  
   return (
 
     // Acts like a header for main page
@@ -21,8 +24,8 @@ export default function Index() {
       <View className="justify-center items-center flex-row mt-16 px-4 mb-4 relative top-2">
         <Image
           source={images.logo}
-            className="w-10 h-10"
-            resizeMode="contain"
+          className="w-10 h-10"
+          resizeMode="contain"
         />
         <Text className="text-4xl text-light-100 ml-3 font-bold">Blogs</Text>
       </View>
