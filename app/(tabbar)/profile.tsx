@@ -1,17 +1,17 @@
 import { ScrollView, View,  } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '@/utils/authStore';
-import { Button, ButtonIcon, Divider, EditIcon, 
+import {Button, ButtonIcon, Divider, EditIcon, 
   FormControl, Text } from '@gluestack-ui/themed';
-import { userData } from '@/services/auth';
+import { refreshExpiredToken, updateUserData, userData } from '@/services/auth';
 import ProfileInput from '@/components/ProfileInput';
 import InfoModal from '@/components/InfoModal';
-
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 
 const profile = () => {
   
-  const {logOut, token, user, username} = useAuthStore();
+  const {token, user, username, refreshToken, logOut, setUsername, changeToken} = useAuthStore();
   
   const [error, setError] = useState('');
 
@@ -19,11 +19,18 @@ const profile = () => {
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
 
   // Input fields for all data | show the previous values from database as default
-  const [userInput, setUserInput] = useState(user.username);
-  const [passInput, setPassInput] = useState(user.username);
-  const [firstInput, setFirstInput] = useState(user.username);
-  const [lastInput, setLastInput] = useState(user.username);
-  const [emailInput, setEmailInput] = useState(user.username);
+  const [userInput, setUserInput] = useState('');
+  const [passInput, setPassInput] = useState('');
+  const [firstInput, setFirstInput] = useState('');
+  const [lastInput, setLastInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [userID, setUserID] = useState(-1);
+
+  const [userInvalid, setUserInvalid] = useState(false);
+  const [passInvalid, setPassInvalid] = useState(false);
+  const [firstInvalid, setFirstInvalid] = useState(false);
+  const [lastInvalid, setLastInvalid] = useState(false);
+  const [emailInvalid, setEmailInvalid] = useState(false);
   
   // Disables input fields unless edit is toggled
   const [disabled, setDisabled] = useState(true);
@@ -36,6 +43,28 @@ const profile = () => {
   const [body, setBody] = useState('');
   const [buttonText, setButtonText] = useState('');
   const [parent, setParent] = useState('');
+
+  const [altered, setAltered] = useState(false);
+
+  const [tokenExpired, setTokenExpired] = useState(false);
+
+  // Refreshes token if expired
+  useEffect(() => {
+    const expiredToken = async () => {
+      if(userID > 0) {
+        try {
+          const data = await refreshExpiredToken(refreshToken, userID, username); 
+
+          changeToken(data.newToken)
+
+        } catch (err: any) {
+          console.error('Fetch error:', err.message);
+        }
+      }
+      
+    }
+    expiredToken()
+  }, [tokenExpired])
   
   // Fetches profile data from database
   useEffect(() => {
@@ -50,9 +79,8 @@ const profile = () => {
         setError('An unexpected error occurred');
       }
     }
-
     fetchProfile();
-  }, [user]);
+  }, [user, username, altered]);
   
   // Sets fetched data into fields | resets value back if user cancels edit mode
   useEffect(() => {
@@ -62,17 +90,112 @@ const profile = () => {
       setFirstInput(profileData.first_name || '');
       setLastInput(profileData.last_name || '');
       setEmailInput(profileData.email || '');
+      setUserID(profileData.id || -1)
     }
+    setUserInvalid(false);
+    setPassInvalid(false);
+    setFirstInvalid(false);
+    setLastInvalid(false);
+    setEmailInvalid(false);
+    setAltered(false)
   }, [profileData, !disabled]);
 
   // Edit button toggle
   const toggleEdit = () => {
     setDisabled(!disabled);
   }
+
+  // Checks to see if any changes were made | prevents redundant backend calls
+  const checkChanges = () => {
+    if (userInput===profileData?.username
+      && passInput===profileData.password_txt
+      && firstInput===profileData.first_name
+      && lastInput===profileData.last_name
+      && emailInput===profileData.email
+    ) {
+      // no fields have change
+      return false;
+    } else {
+      // some fields have changed
+      return true;
+    }
+  }
   
-  // [TO-DO]: Saves any changes to the database
-  const handleSaveChanges = () => {
-    console.log("finish implementation")
+  // Saves changes to database
+  const handleSaveChanges = async () => {
+
+    // Logic Checks
+    const requiredFields = [
+      { value: userInput, setInvalid: setUserInvalid },
+      { value: passInput, setInvalid: setPassInvalid },
+      { value: firstInput, setInvalid: setFirstInvalid },
+      { value: lastInput, setInvalid: setLastInvalid },
+      { value: emailInput, setInvalid: setEmailInvalid },
+    ];
+
+    let hasEmptyField = false;
+
+    // Loops through all fields to check if empty --> show error if true
+    requiredFields.forEach(({ value, setInvalid }) => {
+      if (!value.trim()) {
+        setInvalid(true);
+        hasEmptyField = true;
+      }
+    });
+
+    setShowModal(false);
+
+    if (hasEmptyField) {
+      setError("Please fill the missing field.");
+      return;
+    }
+
+    // Restricted username check
+    if (userInput==='guest' || userInput==='Guest') {
+      setUserInvalid(true);
+      setError("Sorry that username is reserved.")
+      return;
+    }
+
+    // Check for field changes
+    const changes = checkChanges();
+    if (!changes) {
+      toggleEdit();
+      return
+    }
+
+    // Formats data to be sent to backend
+    const newdata = {fName:firstInput, lName:lastInput, userName:userInput, email:emailInput, password:passInput}
+
+    // FOCUS HERE
+    try {
+      const data = await updateUserData(username, userID, token, newdata); 
+
+      // Stores new username if there was any changes made to it
+      if (userInput !== profileData?.username) {
+        setUsername(userInput); 
+      }
+
+      // Will trigger a data fetch with new information
+      // Profile data null removes previous data | altered will trigger useEffect
+      setProfileData(null);
+      setAltered(true);
+
+      // Disables fields
+      setDisabled(true);
+
+    } catch (err: any) {
+
+      if(err.message==='Invalid token') {
+        // Catches invalid tokens
+        setDisabled(true)
+        setTokenExpired(true);
+      } else {
+        setError(`An unexpected error occurred: ${err.message}`);
+      }
+      
+    }
+
   }
   
   // Changes modal information based on where its called 
@@ -117,31 +240,41 @@ const profile = () => {
           >
 
           {/* Profile / Account credentials section */}
-          <Text className='mt-6 mb-2' size='2xl' bold={true} >Your Profile</Text>
-          <FormControl className="p-4 border border-transparent rounded-xl bg-dark-100 w-full gap-6 pb-8">
+          <Text className='mt-6 mb-2' size='2xl' bold={true} >Profile Settings</Text>
+          <FormControl className="p-4 border border-transparent rounded-xl bg-dark-100 w-full gap-6 pb-8" >
 
-            <Text color='$white' className='absolute top-6 left-4' size='lg' bold={true} >Account Information</Text>
+            <Text color='$white' className='absolute top-6 left-4' size='xl' bold={true} >Account Information</Text>
 
             {/* Toggle Edit button */}
-            <Button size="sm" className="rounded-full p-3.5 w-0 self-end" bgColor='#91A3B6' borderRadius={500} onPress={() => {toggleEdit()}}>
+            <Button size="md" className="rounded-full p-3.5 self-end" bgColor='#91A3B6' borderRadius={500} onPress={() => {toggleEdit()}}>
               <ButtonIcon as={EditIcon} />
+              <Text color='$white' size='sm'> Edit</Text>
             </Button>
             
             <Divider/>
 
             {/* Reusable dynamic profile input components */}
-            <ProfileInput title={"Username"} disabled={disabled} userInput={userInput} setInput={setUserInput} />
+            <ProfileInput title={"Username"} disabled={disabled} userInput={userInput} setInput={setUserInput} valid={userInvalid} setValid={setUserInvalid} error={error}/>
             
-            <ProfileInput title={"Password"} disabled={disabled} userInput={passInput} setInput={setPassInput} />
+            <ProfileInput title={"Password"} disabled={disabled} userInput={passInput} setInput={setPassInput} valid={passInvalid} setValid={setPassInvalid} error={error}/>
             
-            <ProfileInput title={"First Name"} disabled={disabled} userInput={firstInput} setInput={setFirstInput} />
+            <ProfileInput title={"First Name"} disabled={disabled} userInput={firstInput} setInput={setFirstInput} valid={firstInvalid} setValid={setFirstInvalid} error={error}/>
             
-            <ProfileInput title={"Last Name"} disabled={disabled} userInput={lastInput} setInput={setLastInput} />
+            <ProfileInput title={"Last Name"} disabled={disabled} userInput={lastInput} setInput={setLastInput} valid={lastInvalid} setValid={setLastInvalid} error={error}/>
             
-            <ProfileInput title={"Email"} disabled={disabled} userInput={emailInput} setInput={setEmailInput} />
-            
+            <ProfileInput title={"Email"} disabled={disabled} userInput={emailInput} setInput={setEmailInput} valid={emailInvalid} setValid={setEmailInvalid} error={error}/>
+
             {/* Dynmaic buttons to save or cancel edits */}
             {!disabled && 
+              <Animated.View 
+                entering={FadeInDown
+                  .springify()
+                  .damping(100)
+                  .mass(5)
+                  .stiffness(500)
+                  .duration(800)
+                }
+            >
               <View className='flex flex-row gap-2 mr-2'>
                 <Button  size="md" variant="solid" action='negative' className='w-[50%]' onPress={toggleEdit}>
                   <Text className="font-bold text-xl" color='$white' size='md'>Cancel</Text>
@@ -150,8 +283,9 @@ const profile = () => {
                   <Text className="font-bold text-xl" color='$white' size='md'>Save Changes</Text>
                 </Button>
               </View>
+            </Animated.View>
             }
-
+            
             {/* Modal component */}
             <InfoModal showModal={showModal} setShowModal={setShowModal} heading={heading} body={body} buttonText={buttonText} parent={'profile'} confirmFunction={parent=='profile' ? handleSaveChanges : logOut}/>
 

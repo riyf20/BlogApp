@@ -7,18 +7,22 @@ type UserState = {
     token: string;
     user: User;
     username: string;
+    refreshToken:string,
 
     isLoggedin: boolean;
     shouldCreateAccount: boolean;
 
-    logIn: ({token, user, username}:logInProps) => void;
+    logIn: ({token, user, username, refreshToken}:logInProps) => void;
     logOut: () => void;
+    setUsername: (username:string) => void;
+    changeToken: (newToken:string) => void;
 }
 
 type logInProps = {
     token:string, 
     user:User, 
     username:string,
+    refreshToken:string,
 }
 
 // Export the hook, takes an arrow function that returns as object with each of the keys in our state
@@ -38,7 +42,8 @@ export const useAuthStore = create(
             username:''
         },
         username: '',
-        logIn: ({token, user, username}:logInProps) => {
+        refreshToken: '',
+        logIn: ({token, user, username, refreshToken}:logInProps) => {
             set((state) => {
                 return {
                     ...state,
@@ -47,6 +52,7 @@ export const useAuthStore = create(
                     token,
                     user,
                     username,
+                    refreshToken,
                 }
             })
         },
@@ -64,8 +70,25 @@ export const useAuthStore = create(
                         username:''
                     },
                     username: '',
+                    refreshToken: '',
                 }
             })
+        },
+        setUsername(username) {
+            set((state) => ({
+                ...state,
+                username,
+                user:{
+                    ...state.user,
+                    username,
+                }
+            }))
+        },
+        changeToken(newToken) {
+            set((state) => ({
+                ...state,
+                token: newToken,
+            }))
         }
         }),
    

@@ -18,7 +18,7 @@ export default function Index() {
     // Acts like a header for main page
     <View className="flex-1 bg-dark-100">
 
-      <View className="justify-center items-center flex-row mt-16 px-4 mb-4">
+      <View className="justify-center items-center flex-row mt-16 px-4 mb-4 relative top-2">
         <Image
           source={images.logo}
             className="w-10 h-10"
@@ -67,7 +67,7 @@ export default function Index() {
               <>
                 {/* Maps blogs and renders a card for each */}
                 {blogs?.map((item:Blog, index) => (
-                  <BlogCard key={item.id} {...item} index={index}/>
+                  <BlogCard key={item.id} {...item} index={index} edit={false}/>
                 ))}
               </>
             )}

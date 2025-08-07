@@ -47,4 +47,24 @@ interface ProfileInputProps {
     disabled: boolean, 
     userInput: string, 
     setInput: (arg0: string) => void;
+    valid: boolean
+    setValid: (arg0: boolean) => void;
+    error: string,
+}
+
+interface usersBlog {
+    author: string,
+    body: string,
+    created_at: string,
+    id: number, 
+    title: string,
+    updated_at: string,
+}
+interface usersComment {
+    author: string,
+    body: string,
+    created_at: string,
+    id: number, 
+    postid: number, 
+    updated_at: string,
 }

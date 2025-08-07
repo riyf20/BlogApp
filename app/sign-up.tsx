@@ -93,6 +93,7 @@ const signUp = () => {
               token: data.token,
               user: data.user,
               username: data.username, 
+              refreshToken: data.refreshToken,
           });
 
         } catch (err: any) {

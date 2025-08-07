@@ -60,11 +60,13 @@ const signIn = () => {
         try {
             const data = await loginUser(username, password);
 
+            console.log("refresh = ", data.refreshToken)
             // Saves data to the backend Auth for persistant state
             logIn({
                 token: data.token,
                 user: data.user,
                 username: data.username, 
+                refreshToken: data.refreshToken,
             });
 
         } catch (err: any) {
@@ -92,6 +94,7 @@ const signIn = () => {
                 token: data.token,
                 user: data.user,
                 username: 'guest', 
+                refreshToken: data.refreshToken,
             });
 
         } catch (err: any) {
