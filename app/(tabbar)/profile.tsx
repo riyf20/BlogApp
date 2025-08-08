@@ -228,7 +228,7 @@ const profile = () => {
             <Text color='$white' className='absolute top-6 left-4' size='xl' bold={true} >Account Information</Text>
 
             {/* Toggle Edit button */}
-            <Button size="md" className="rounded-full p-3.5 self-end" bgColor='#91A3B6' borderRadius={500} onPress={() => {toggleEdit()}}>
+            <Button size="md" className="rounded-full p-3.5 self-end" bgColor={disabled ?  '#91A3B6' : '#228B22'} borderRadius={500} onPress={() => {toggleEdit()}}>
               <ButtonIcon as={EditIcon} />
               <Text color='$white' size='sm'> Edit</Text>
             </Button>

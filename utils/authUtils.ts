@@ -2,7 +2,7 @@ import {jwtDecode} from 'jwt-decode';
 import { useAuthStore } from '@/utils/authStore';
 import { refreshExpiredToken } from '@/services/auth';
 
-const debug = true
+const debug = false
 let refreshTimeout: ReturnType<typeof setTimeout> | null = null;
 
 export const scheduleTokenRefresh = (token: string) => {
@@ -38,7 +38,8 @@ export const refreshToken = async () => {
   // {debug && console.log("refreshToken called")}
 
   // Does not need to refresh for guest
-  if(useAuthStore.getState().username !== 'guest' && useAuthStore.getState().user.isGuest) {
+  if(useAuthStore.getState().username !== 'guest' && !useAuthStore.getState().user.isGuest) {
+
     try {
       const {
         refreshToken: refresh,

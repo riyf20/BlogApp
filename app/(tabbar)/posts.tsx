@@ -36,6 +36,7 @@ const posts = () => {
   const [blogsLoaded, setBlogsLoaded] = useState(false);
   const [commentsLoaded, setCommentsLoaded] = useState(false);
   
+  const [deletion, setDeletion] = useState(false);
 
   // Fetches Blog data from database  
   const fetchBlogs = async () => {
@@ -67,11 +68,17 @@ const posts = () => {
     }
   }
 
-  // Triggers fetch
   useEffect(() => {
-    fetchBlogs();
-    fetchComments();
-  }, [user, refreshing]);
+    const fetchAll = async () => {
+      await Promise.all([fetchBlogs(), fetchComments()]);
+      setDeletion(false)
+      setBlogEdit(false)
+      setCommentEdit(false);
+      // console.log("fetched all!")
+    };
+
+    fetchAll();
+  }, [user, refreshing, deletion]);
     
   return (
 
@@ -87,15 +94,17 @@ const posts = () => {
           contentContainerStyle={{
             minHeight: '100%',
           }}
+          className='pb-[250px]'
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={() => {
+              // console.log("refreshed!")
               fetchBlogs();
               fetchComments();
             }}
             />
           }
           >
-          <View className="mt-4 bg-white border border-transparent rounded-xl h-full">
+          <View className="mt-4 bg-white border border-transparent rounded-xl h-full pb-[250px]">
 
           {
             error ? (
@@ -115,7 +124,7 @@ const posts = () => {
                 <View className='self-center justify-center items-center border border-transparent rounded-xl bg-dark-100 w-[94%] mt-8 pb-8'>
 
                   <Text className='mt-5 ml-5 mb-4 self-start' size='2xl' color='$white' bold={true} >Your Blogs</Text>
-                  <Button size="md" className="rounded-full p-3.5 self-end absolute top-3 right-4" bgColor='#91A3B6' borderRadius={500} onPress={() => {toggleBlogEdit()}}>
+                  <Button size="md" className="rounded-full p-3.5 self-end absolute top-3 right-4" bgColor={blogEdit ? '#228B22' : '#91A3B6'} borderRadius={500} onPress={() => {toggleBlogEdit()}}>
                     <ButtonIcon as={EditIcon} />
                     <Text color='$white' size='sm'> Edit</Text>
                   </Button>
@@ -130,7 +139,7 @@ const posts = () => {
                         </Text>
                       ) : (
                         blogData?.map((item:Blog, index) => (
-                          <BlogCard key={item.id} {...item} index={index} edit={blogEdit}/>
+                          <BlogCard key={item.id} {...item} index={index} edit={blogEdit} deletion={setDeletion}/>
                         ))
                       )}
                     </View>
@@ -140,7 +149,7 @@ const posts = () => {
                 <View className='self-center justify-center items-center border border-transparent rounded-xl bg-dark-100 w-[94%] mt-8 pb-8'>
 
                   <Text className='mt-5 ml-5 mb-4 self-start' size='2xl' color='$white' bold={true} >Your Comments</Text>
-                  <Button size="md" className="rounded-full p-3.5 self-end absolute top-3 right-4" bgColor='#91A3B6' borderRadius={500} onPress={() => {toggleCommentEdit()}}>
+                  <Button size="md" className="rounded-full p-3.5 self-end absolute top-3 right-4" bgColor={commentEdit ? '#228B22' : '#91A3B6'} borderRadius={500} onPress={() => {toggleCommentEdit()}}>
                     <ButtonIcon as={EditIcon} />
                     <Text color='$white' size='sm'> Edit</Text>
                   </Button>
@@ -154,7 +163,7 @@ const posts = () => {
                         </Text>
                       ) : (
                         commentData?.map((comment: usersComment, index) => (
-                          <CommentCard key={comment.id} {...comment} index={index} edit={commentEdit}/>
+                          <CommentCard key={comment.id} {...comment} index={index} edit={commentEdit} deletion={setDeletion}/>
                         ))
                       )}
                     </View>

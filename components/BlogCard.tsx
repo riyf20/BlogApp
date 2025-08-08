@@ -3,10 +3,26 @@ import React from 'react'
 import { Link } from 'expo-router'
 import Animated, {FadeInDown, ReduceMotion, FadeInRight } from 'react-native-reanimated';
 import { Button, ButtonIcon, TrashIcon } from '@gluestack-ui/themed';
+import { useAuthStore } from '@/utils/authStore';
+import { deleteBlog } from '@/services/auth';
 
-type BlogCardProps = Blog & { index: number, edit:boolean };
+type BlogCardProps = Blog & { index: number, edit:boolean, deletion?:(booleon: any) => void};
 
-const BlogCard = ({ title, id, author, index, edit }: BlogCardProps) => {
+const BlogCard = ({ title, id, author, index, edit, deletion }: BlogCardProps) => {
+
+    const {token, username} = useAuthStore()
+
+    const handleDelete = async () => {
+
+        try {
+            const data = await deleteBlog(id, token, username)
+            // console.log("blog deleted")
+        } catch (error:any) {
+            console.error(error.message)
+        }
+        deletion?.(true);
+        
+    }
         
   return (
     <>
@@ -36,7 +52,7 @@ const BlogCard = ({ title, id, author, index, edit }: BlogCardProps) => {
                         }
                     >
                         <View>
-                            <Button size="sm" variant="solid" action="negative" className="w-[100px] h-full" borderRadius={100} >
+                            <Button size="sm" variant="solid" action="negative" className="w-[100px] h-full" borderRadius={100} onPress={handleDelete}>
                                 <ButtonIcon as={TrashIcon} />
                                 <Text className="font-bold text-lg text-white"> Delete</Text>
                             </Button>

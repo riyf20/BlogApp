@@ -84,6 +84,7 @@ export const userCommentData = async (username: string, token:string) => {
   return data;
 };
 
+// Updates user credentials
 export const updateUserData = async (username: string, userID:number, token:string, 
   newdata:{fName:string, lName:string, userName:string, email:string, password:string}) => {
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/profile/${username}/${userID}/update`, {
@@ -101,6 +102,7 @@ export const updateUserData = async (username: string, userID:number, token:stri
   return data;
 };
 
+// Refreshes expired tokens
 export const refreshExpiredToken = async (refreshToken:string, userID:number, username:string) => {
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/refreshtoken`, {
     method: 'POST',
@@ -115,6 +117,7 @@ export const refreshExpiredToken = async (refreshToken:string, userID:number, us
   return data;
 }
 
+// Clears token during logout
 export const clearRefreshToken = async (refreshToken:string, userID:number, token:string) => {
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/refreshtoken/delete`, {
     method: 'POST',
@@ -128,3 +131,33 @@ export const clearRefreshToken = async (refreshToken:string, userID:number, toke
   if (!response.ok) throw new Error(data.message || 'Deleting refresh Token failed');
   return data;
 }
+
+// Deletes blogs
+export const deleteBlog = async (blogId:number, token:string, username:string) => {
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/profile/${username}/${blogId}/delete`, {
+    method: 'DELETE',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+  })
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.message || 'Failed to delete blog');
+  return data;
+};
+
+// Deletes comment
+export const deleteComment = async (username:string, postid:number, commentId:number, token:string) => {
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/profile/${username}/${commentId}/${postid}/delete`, {
+    method: 'DELETE',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+  })
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.message || 'Failed to delete comment');
+  return data;
+};
