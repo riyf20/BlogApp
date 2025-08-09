@@ -3,6 +3,7 @@ import { ImageBackground, Text, View } from "react-native";
 import {Feather, AntDesign} from '@expo/vector-icons';
 import { images } from "@/constants/images";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { HapticTab } from "@/components/HapticTab";
 
 // For the tab bar at the bottom
 function TabIcon({ focused, icon, title }: any) {
@@ -43,6 +44,7 @@ export default function TabsLayout() {
           justifyContent: "center",
           alignItems: "center",
         },
+        tabBarButton: HapticTab,
         tabBarStyle: {
           backgroundColor: "#121C22",
           borderRadius: 50,

@@ -84,7 +84,7 @@ const posts = () => {
 
     <View className="flex-1 bg-dark-100">
 
-      <View className="justify-center items-center flex-row mt-20 px-4 mb-4">
+      <View className="justify-center items-center flex-row mt-16 px-4 mb-4">
         <Text color='$white' size='2xl' className="self-center" bold={true}>Posts</Text>
       </View>
 

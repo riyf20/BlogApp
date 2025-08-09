@@ -161,3 +161,53 @@ export const deleteComment = async (username:string, postid:number, commentId:nu
   if (!response.ok) throw new Error(data.message || 'Failed to delete comment');
   return data;
 };
+
+// Grab user's blog data
+export const userSearch = async (searchBy:string, search:string, token:string) => {
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/search?type=${searchBy}&field=${encodeURIComponent(search)}`, {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    }
+  })
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Blog search failed');
+  return data;
+};
+
+// Grabs comments for specific blog
+export const fetchComments = async (id:number, token:string) => {
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/${id}/comments`, {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    }
+  })
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Comment fetch failed');
+  return data;
+}
+
+// Enters new comment for a specific blog
+export const sendComment = async (commentField:string, username:string, id:number, token:string) => {
+
+  const comment = {body:commentField, user:username, id}
+
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/${id}/comment`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(comment)
+  })
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.message || 'Failed to comment');
+  return data;
+
+  // console.log(comment)
+  return;
+};

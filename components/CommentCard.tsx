@@ -2,13 +2,13 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { Link } from 'expo-router'
 
-import Animated, { FadeIn, FadeInDown, FadeInRight, FadeOut, ReduceMotion } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeInRight, ReduceMotion } from 'react-native-reanimated';
 import { Button, ButtonIcon, TrashIcon } from '@gluestack-ui/themed';
 import { useAuthStore } from '@/utils/authStore';
 import { deleteComment } from '@/services/auth';
 
 
-type userCommentProps = usersComment & { index: number, edit:boolean, deletion:(booleon: any) => void };
+type userCommentProps = usersComment & { index: number, edit:boolean, deletion?:(booleon: any) => void };
 
 const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, deletion }: userCommentProps) => {
 
@@ -31,7 +31,7 @@ const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, dele
         } catch (error:any) {
             console.error(error.message)
         }
-        deletion(true);
+        deletion?.(true);
         
     }
         
