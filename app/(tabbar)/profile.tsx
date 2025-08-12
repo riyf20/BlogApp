@@ -1,19 +1,20 @@
-import { ScrollView, View,  } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { useAuthStore } from '@/utils/authStore';
+import { ScrollView, View,  } from 'react-native'
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import {Button, ButtonIcon, Divider, EditIcon, 
   FormControl, Text } from '@gluestack-ui/themed';
-import { clearRefreshToken, refreshExpiredToken, updateUserData, userData } from '@/services/auth';
+import { useAuthStore } from '@/utils/authStore';
+import { clearRefreshToken, updateUserData, userData } from '@/services/auth';
+import { clearRefreshTimeout } from '@/utils/authUtils';
 import ProfileInput from '@/components/ProfileInput';
 import InfoModal from '@/components/InfoModal';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-import { clearRefreshTimeout } from '@/utils/authUtils';
+import * as Haptics from 'expo-haptics';
 
 
 const profile = () => {
   
-  const {token, user, username, refreshToken, logOut, setUsername, changeToken} = useAuthStore();
-  
+  // Persisted data
+  const {token, user, username, refreshToken, logOut, setUsername} = useAuthStore();
   const [error, setError] = useState('');
 
   // Store profile data from database
@@ -58,7 +59,7 @@ const profile = () => {
         setProfileData(data);
 
       } catch (err: any) {
-        console.error('Fetch error:', err.message);
+        console.error('Fetch error | Fetching profile:', err.message);
         setError('An unexpected error occurred');
       }
     }
@@ -167,7 +168,8 @@ const profile = () => {
       setDisabled(true);
 
     } catch (err: any) {
-      setError(`An unexpected error occurred: ${err.message}`);      
+      console.error('Fetch error | Updating profile:', err.message);
+      setError('An unexpected error occurred');      
     }
 
   }
@@ -200,6 +202,10 @@ const profile = () => {
     logOut();
   }
 
+  const haptic = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+  }
+
   return (
 
     // Acts like a header for the page
@@ -228,7 +234,7 @@ const profile = () => {
             <Text color='$white' className='absolute top-6 left-4' size='xl' bold={true} >Account Information</Text>
 
             {/* Toggle Edit button */}
-            <Button size="md" className="rounded-full p-3.5 self-end" bgColor={disabled ?  '#91A3B6' : '#228B22'} borderRadius={500} onPress={() => {toggleEdit()}}>
+            <Button size="md" className="rounded-full p-3.5 self-end" bgColor={disabled ?  '#91A3B6' : '#228B22'} borderRadius={500} onPress={() => {toggleEdit()}} onPressIn={haptic}>
               <ButtonIcon as={EditIcon} />
               <Text color='$white' size='sm'> Edit</Text>
             </Button>

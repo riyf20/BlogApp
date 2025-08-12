@@ -1,19 +1,23 @@
-import { Pressable, View } from 'react-native'
 import React, { useState } from 'react'
-import { useAuthStore } from '@/utils/authStore'
-import { router } from 'expo-router';
+import { Pressable, View } from 'react-native'
 import { Button, Heading, Text, FormControl, 
     FormControlErrorText, FormControlErrorIcon, 
     AlertCircleIcon, FormControlError, Divider,
     ButtonText,
 } from '@gluestack-ui/themed';
+import { router } from 'expo-router';
+import { useAuthStore } from '@/utils/authStore'
+import { scheduleTokenRefresh } from '@/utils/authUtils';
 import { loginGuestUser, loginUser } from '@/services/auth';
 import FormInput from '@/components/FormInput';
 import InfoModal from '@/components/InfoModal';
-import { scheduleTokenRefresh } from '@/utils/authUtils';
+import { useHapticFeedback as haptic} from '@/components/HapticTab';
+
+
 
 const signIn = () => {
     
+    // Persisted data
     const {logIn} = useAuthStore();
 
     // Username variable | username valid state 
@@ -33,8 +37,10 @@ const signIn = () => {
     // Dynamic modal to confirm actions
     const [showModal, setShowModal] = useState(false);
 
+    // Logins in the user
     const handleLogin = async () => {
 
+        // Logic Checks
         const requiredFields = [
             { value: username, setInvalid: setUserInvalid },
             { value: password, setInvalid: setPassInvalid },
@@ -67,7 +73,7 @@ const signIn = () => {
                 username: data.username, 
                 refreshToken: data.refreshToken,
             });
-            // Sets timeout on log in
+            // Sets timeout for token refreshing on log in
             scheduleTokenRefresh(data.token); 
 
         } catch (err: any) {
@@ -79,11 +85,13 @@ const signIn = () => {
                 setPassInvalid(true);
                 setError('Incorrect password');
             } else {
+                console.error("Error occured | Signing in:", err.message)
                 setError('An unexpected error occurred');
             }
         }
     };
 
+    // Logs in user as guest
     const handleGuestMode = async () => {
 
         // Attempts to guest login 
@@ -100,6 +108,7 @@ const signIn = () => {
 
         } catch (err: any) {
             // Catches messages from backend and any other errors
+            console.error("Error occured | Guest mode sign in:", err.message)
             setError('An unexpected error occurred');
         }
     }
@@ -132,7 +141,7 @@ const signIn = () => {
                 }
 
                 <Button 
-                    size="md" variant="solid" bg='#47a7a7' onPress={handleLogin}
+                    size="md" variant="solid" bg='#47a7a7' onPress={handleLogin} onPressIn={haptic()}
                 >
                     <Text className="font-bold text-xl" color='$white' size='lg'>Sign in</Text>
                 </Button>
@@ -152,7 +161,7 @@ const signIn = () => {
             {/* Guest mode block */}
             <View className='p-4 border border-transparent rounded-xl bg-secondaryLight w-[80%] gap-2 mt-10 items-center'>
                 <Text color='$white' bold={true} >Try the new Guest mode!</Text>
-                <Button onPress={() => setShowModal(true)} bg='#1C2B33'>
+                <Button onPress={() => setShowModal(true)} bg='#1C2B33' onPressIn={haptic()}>
                     <ButtonText>Guest Mode</ButtonText>
                 </Button>
                 

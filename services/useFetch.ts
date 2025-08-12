@@ -6,10 +6,8 @@ const useFetch = <T>(url: string, method = 'GET', autoFetch=true) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null)    
     
-    // useEffect(() => {  
     const fetchData = () => {
 
-        // console.log("Fetch called")
         const abortCont = new AbortController();
 
             fetch(url, {method, signal: abortCont.signal})
@@ -36,7 +34,6 @@ const useFetch = <T>(url: string, method = 'GET', autoFetch=true) => {
         return () => abortCont.abort();
 
     }
-    // , [url, method]);
 
     const reset = () => {
         setData(null);

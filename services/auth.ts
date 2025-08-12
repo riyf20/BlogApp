@@ -1,7 +1,7 @@
 import { useAuthStore } from "@/utils/authStore";
 import { setItem } from "expo-secure-store";
 
-// Logs user in by connecting to backend
+// Logs user in
 export const loginUser = async (username: string, password: string) => {
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/login`, {
     method: 'POST',
@@ -14,7 +14,7 @@ export const loginUser = async (username: string, password: string) => {
   return data;
 };
 
-// Logs user in by connecting to backend
+// Logs Guest User in
 export const loginGuestUser = async () => {
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/login/guest-mode`, {
     method: 'POST',
@@ -26,7 +26,7 @@ export const loginGuestUser = async () => {
   return data;
 };
 
-// Signs user up by connecting to backend
+// Signs user up 
 export const signupUser = async (username:string, password:string, email:string, firstName:string, lastName:string) => {
 
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/register`, {
@@ -36,7 +36,6 @@ export const signupUser = async (username:string, password:string, email:string,
   });
 
   const data = await response.json();
-  if(response.ok) {console.log("all good for now")}
   if (!response.ok) throw new Error(data.message || 'Signup failed');
 }
 
@@ -51,7 +50,6 @@ export const userData = async (username: string, token:string) => {
   })
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Profile data fetch failed');
-  // console.log(data[0])
   return data[0];
 };
 
@@ -80,7 +78,6 @@ export const userCommentData = async (username: string, token:string) => {
   })
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Comment data fetch failed');
-  // console.log(data)
   return data;
 };
 
@@ -96,8 +93,6 @@ export const updateUserData = async (username: string, userID:number, token:stri
     body: JSON.stringify(newdata)
   })
   const data = await response.json();
-  // console.log(JSON.stringify(newdata))
-  // console.log(data)
   if (!response.ok) throw new Error(data.message || 'Failed to update user profile');
   return data;
 };
@@ -113,7 +108,6 @@ export const refreshExpiredToken = async (refreshToken:string, userID:number, us
   })
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Refresh Token Failed');
-  // console.log(data)
   return data;
 }
 
@@ -132,7 +126,7 @@ export const clearRefreshToken = async (refreshToken:string, userID:number, toke
   return data;
 }
 
-// Deletes blogs
+// Deletes specified blog
 export const deleteBlog = async (blogId:number, token:string, username:string) => {
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/profile/${username}/${blogId}/delete`, {
     method: 'DELETE',
@@ -147,7 +141,7 @@ export const deleteBlog = async (blogId:number, token:string, username:string) =
   return data;
 };
 
-// Deletes comment
+// Deletes specified comment
 export const deleteComment = async (username:string, postid:number, commentId:number, token:string) => {
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/profile/${username}/${commentId}/${postid}/delete`, {
     method: 'DELETE',
@@ -162,7 +156,7 @@ export const deleteComment = async (username:string, postid:number, commentId:nu
   return data;
 };
 
-// Grab user's blog data
+// Searches blogs
 export const userSearch = async (searchBy:string, search:string, token:string) => {
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/search?type=${searchBy}&field=${encodeURIComponent(search)}`, {
     method: 'GET',
@@ -176,7 +170,7 @@ export const userSearch = async (searchBy:string, search:string, token:string) =
   return data;
 };
 
-// Grabs comments for specific blog
+// Searches comments
 export const fetchComments = async (id:number, token:string) => {
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/${id}/comments`, {
     method: 'GET',
@@ -186,14 +180,14 @@ export const fetchComments = async (id:number, token:string) => {
     }
   })
   const data = await response.json();
-  if (!response.ok) throw new Error(data.message || 'Comment fetch failed');
+  if (!response.ok) throw new Error(data.message || 'Comment search failed');
   return data;
 }
 
 // Enters new comment for a specific blog
-export const sendComment = async (commentField:string, username:string, id:number, token:string) => {
+export const sendComment = async (body:string, user:string, id:number, token:string) => {
 
-  const comment = {body:commentField, user:username, id}
+  const comment = {body, user, id}
 
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/${id}/comment`, {
     method: 'POST',
@@ -207,7 +201,42 @@ export const sendComment = async (commentField:string, username:string, id:numbe
 
   if (!response.ok) throw new Error(data.message || 'Failed to comment');
   return data;
+};
 
-  // console.log(comment)
-  return;
+// Posts new blog
+export const postBlog = async (author:string, token:string, title:string, body:string) => {
+
+  const blog = {title, body, author}
+
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/post`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(blog)
+  })
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.message || 'Failed to post blog');
+  return data;
+
+};
+
+// Posts images for new blog
+export const postImage = async (blogId:number, blogAuthor:string, imageBlob:any, token:string,) => {
+
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/images/upload`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({ blogId, blogAuthor, imageBlob })
+  })
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.message || 'Failed to post images');
+  return data;
+
 };

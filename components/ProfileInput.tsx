@@ -1,6 +1,9 @@
-import { View, Text } from 'react-native'
 import React from 'react'
-import { AlertCircleIcon, FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText, FormControlLabelText, Input, InputField } from '@gluestack-ui/themed';
+import { View } from 'react-native'
+import { AlertCircleIcon, FormControl, 
+  FormControlError, FormControlErrorIcon, 
+  FormControlErrorText, FormControlLabelText, 
+Input, InputField } from '@gluestack-ui/themed';
 
 // Custom/altered input fields for the profile page
 const ProfileInput = ({title, disabled, userInput, setInput, valid, setValid, error}: ProfileInputProps) => {

@@ -1,10 +1,9 @@
+import React, { useState } from "react";
 import { ActivityIndicator, Image, RefreshControl, ScrollView, Text, View } from "react-native";
 import { images } from "@/constants/images";
 import useFetch from "@/services/useFetch";
-import React, { useState } from "react";
 import BlogCard from "@/components/BlogCard";
 import { useAppRefresh } from "@/utils/useAppRefresh";
-
 
 export default function Index() {
 

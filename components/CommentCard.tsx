@@ -1,17 +1,14 @@
-import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { Link } from 'expo-router'
-
+import { View, Text, TouchableOpacity } from 'react-native'
 import Animated, { FadeInDown, FadeInRight, ReduceMotion } from 'react-native-reanimated';
 import { Button, ButtonIcon, TrashIcon } from '@gluestack-ui/themed';
+import { Link } from 'expo-router'
 import { useAuthStore } from '@/utils/authStore';
 import { deleteComment } from '@/services/auth';
 
+const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, deletion }: CommentCardProps) => {
 
-type userCommentProps = usersComment & { index: number, edit:boolean, deletion?:(booleon: any) => void };
-
-const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, deletion }: userCommentProps) => {
-
+    // Persisted data
     const {token, username} = useAuthStore()
     
     // Changes date format
@@ -23,13 +20,13 @@ const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, dele
         });
     };
 
+    // Deletes specific comment
     const handleDelete = async () => {
  
         try {
             const data = await deleteComment(username, postid, commentId, token)
-            // console.log("comment deleted")
         } catch (error:any) {
-            console.error(error.message)
+            console.error("Error occured | Deleting comment", error.message)
         }
         deletion?.(true);
         
@@ -43,8 +40,10 @@ const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, dele
                 .delay(index * 150)
                 .reduceMotion(ReduceMotion.Never)
             }>
+            {/* Shows a delete button if edit is true */}
             {edit ? (
                 <View className="flex-row items-center justify-between mx-2 mt-4">
+
                     <Link href={`/blog/${postid}`} asChild>
                         <TouchableOpacity className="flex-1 border border-black rounded-2xl mr-2 bg-white">
                             <Text className="text-lg text-primary font-bold mt-5 px-5">{body}</Text>
@@ -70,6 +69,8 @@ const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, dele
                     </Animated.View>
                 </View>
             ) : (
+
+                // Shows basic commentcard
                 <Link href={`/blog/${postid}`} asChild>
                     <TouchableOpacity className="border border-black rounded-2xl mt-4 mx-2 bg-white">
                         <Text className="text-lg text-primary font-bold mt-5 px-5">{body}</Text>
@@ -77,7 +78,6 @@ const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, dele
                     </TouchableOpacity>
                 </Link>
             )}
-
         </Animated.View>
     </>
   )

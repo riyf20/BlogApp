@@ -1,8 +1,8 @@
-import { Tabs } from "expo-router";
 import { ImageBackground, Text, View } from "react-native";
+import { Tabs } from "expo-router";
 import {Feather, AntDesign} from '@expo/vector-icons';
-import { images } from "@/constants/images";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { images } from "@/constants/images";
 import { HapticTab } from "@/components/HapticTab";
 
 // For the tab bar at the bottom

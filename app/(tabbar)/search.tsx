@@ -1,18 +1,20 @@
-import { ActivityIndicator, ScrollView, View } from 'react-native'
 import React, { useState } from 'react'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 import {AlertCircleIcon, Button, ChevronDownIcon, FormControl, 
   FormControlError, FormControlErrorIcon, FormControlErrorText, 
   Input, InputField, InputIcon, InputSlot, SearchIcon, Select, 
-  SelectBackdrop, SelectContent, SelectDragIndicator, 
-  SelectDragIndicatorWrapper, SelectIcon, SelectInput, 
+  SelectBackdrop, SelectContent, SelectIcon, SelectInput, 
   SelectItem, SelectPortal, SelectTrigger, Text } from '@gluestack-ui/themed';
 import BlogCard from '@/components/BlogCard';
+import CommentCard from '@/components/CommentCard';
 import { useAuthStore } from '@/utils/authStore';
 import { userSearch } from '@/services/auth';
-import CommentCard from '@/components/CommentCard';
+import { useHapticFeedback as haptic } from '@/components/HapticTab';
+
 
 const search = () => {
 
+  // Persisted data
   const {token} = useAuthStore();  
 
   // Search query and type 
@@ -31,7 +33,8 @@ const search = () => {
 
   // If a query was made
   const [query, setQuery] = useState(false);
-
+  
+  // Searches for user query
   const handleSearch = async () => {
     
     // Search field cannot be empty
@@ -46,11 +49,10 @@ const search = () => {
     setIsLoading(true);
 
     try {
-      // Calls backend using query
+      // Makes call to backend
       const data = await userSearch(searchBy, search, token);
       
-
-      // Uses Comment and commentcard component based on search type
+      // Sets data based on search type
       if(searchBy==='comments') {
         setBlogs(null)
         setComments(data)
@@ -68,10 +70,8 @@ const search = () => {
 
     } catch (err:any) {
       setIsLoading(false)
-      console.log("Error occured: ", err.message)
+      console.log("Error occured | Searching:", err.message)
     }
-
-   
   };
   
 
@@ -88,6 +88,8 @@ const search = () => {
           <FormControl className='justify-center self-center w-[94%] my-4 gap-4'>
             
             <FormControl isInvalid={searchInvalid}>
+              
+              {/* Search input bar */}
             <Input borderRadius={20}  >
               <InputSlot className='ml-4'>
                 <InputIcon as={SearchIcon} />
@@ -103,6 +105,8 @@ const search = () => {
                   }}
               />
             </Input>
+
+            {/* Search input bar error message */}
             {searchInvalid &&
                 <View className='ml-4'>
                 <FormControlError className='mr-20'>
@@ -115,6 +119,7 @@ const search = () => {
             }
             </FormControl>
 
+            {/* Search category selector */}
             <Select selectedValue={searchBy} onValueChange={(value) => setSearchBy(value)}>
               <SelectTrigger variant="rounded" size="md">
                 <SelectInput placeholder="Search by..." />
@@ -123,10 +128,7 @@ const search = () => {
 
               <SelectPortal>
                 <SelectBackdrop />
-                <SelectContent>
-                  <SelectDragIndicatorWrapper>
-                    <SelectDragIndicator />
-                  </SelectDragIndicatorWrapper>
+                <SelectContent className='pb-20 pt-4'>
                   <SelectItem label="Author" value="author" />
                   <SelectItem label="Title" value="title" />
                   <SelectItem label="Body" value="body" />
@@ -136,7 +138,7 @@ const search = () => {
             </Select>
 
             <Button 
-              size="md" variant="solid" bg='#47a7a7' onPress={handleSearch}
+              size="md" variant="solid" bg='#47a7a7' onPress={handleSearch} onPressIn={haptic()}
             >
               <Text className="font-bold text-xl" color='$white' size='lg'>Search</Text>
             </Button>
@@ -177,12 +179,15 @@ const search = () => {
                     </>
                   ) : (
                     <>
+                      {/* Renders blogcard if blog has data | Query was of type blog */}
                       {blogs ?
                         <>
                           {blogs?.map((item:Blog, index) => (
                             <BlogCard key={item.id} {...item} index={index} edit={false}/>
                           ))}
                         </> 
+                      
+                      // Else renders commentcard if comment has data | Query was of type comment */
                       : comment ?
                           <>
                           {comment?.map((comment:usersComment, index) => (
@@ -191,7 +196,7 @@ const search = () => {
                           </> 
                           : 
                           <>
-                            {
+                            { // No data was found
                               query &&
                                 (<View className='justify-center items-center mt-6'>
                                   <Text bold={true}>No Search Results Found</Text>
@@ -206,8 +211,6 @@ const search = () => {
 
               </ScrollView>
             </View>
-            
-          
         </View>
       </View>
   )

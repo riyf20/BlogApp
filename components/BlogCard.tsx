@@ -1,24 +1,24 @@
-import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { Link } from 'expo-router'
+import { View, Text, TouchableOpacity } from 'react-native'
 import Animated, {FadeInDown, ReduceMotion, FadeInRight } from 'react-native-reanimated';
 import { Button, ButtonIcon, TrashIcon } from '@gluestack-ui/themed';
+import { Link } from 'expo-router'
 import { useAuthStore } from '@/utils/authStore';
 import { deleteBlog } from '@/services/auth';
 
-type BlogCardProps = Blog & { index: number, edit:boolean, deletion?:(booleon: any) => void};
 
 const BlogCard = ({ title, id, author, index, edit, deletion }: BlogCardProps) => {
 
+    // Persisted data
     const {token, username} = useAuthStore()
 
+    // Deletes specific blog
     const handleDelete = async () => {
 
         try {
             const data = await deleteBlog(id, token, username)
-            // console.log("blog deleted")
         } catch (error:any) {
-            console.error(error.message)
+            console.error("Error occured | Deleting blog", error.message)
         }
         deletion?.(true);
         
@@ -32,6 +32,7 @@ const BlogCard = ({ title, id, author, index, edit, deletion }: BlogCardProps) =
             .delay(index * 150)
             .reduceMotion(ReduceMotion.Never)
         }>
+            {/* Shows a delete button if edit is true */}
             {edit ? (
                 <View className="flex-row items-center justify-between mx-2 mt-4">
 
@@ -59,7 +60,9 @@ const BlogCard = ({ title, id, author, index, edit, deletion }: BlogCardProps) =
                         </View>
                     </Animated.View>
                 </View>
-                ) : (
+            ) : (
+                
+                // Shows basic blogcard 
                 <Link href={`/blog/${id}`} asChild>
                     <TouchableOpacity className="border border-black rounded-2xl mt-4 mx-2 bg-white">
                     <Text className="text-lg text-primary font-bold mt-5 px-5">{title}</Text>

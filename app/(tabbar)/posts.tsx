@@ -1,10 +1,12 @@
-import { RefreshControl, ScrollView, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
+import { RefreshControl, ScrollView, View } from 'react-native'
+import { router } from 'expo-router';
+import {AddIcon, Button, ButtonIcon, Divider, EditIcon, Text } from '@gluestack-ui/themed';
 import { useAuthStore } from '@/utils/authStore'
-import {Button, ButtonIcon, Divider, EditIcon, Text } from '@gluestack-ui/themed';
 import { userBlogData, userCommentData } from '@/services/auth';
 import BlogCard from '@/components/BlogCard';
 import CommentCard from '@/components/CommentCard';
+import { useHapticFeedback as haptic } from '@/components/HapticTab';
 
 const posts = () => {
 
@@ -16,6 +18,7 @@ const posts = () => {
   const [blogData, setBlogData] = useState<usersBlog[] | null>(null)
   const [commentData, setCommentData] = useState<usersComment[] | null>(null)
 
+  // Refreshes page
   const [refreshing, setRefreshing] = useState(false);
   
   // Edit state for blogs and comments
@@ -36,6 +39,7 @@ const posts = () => {
   const [blogsLoaded, setBlogsLoaded] = useState(false);
   const [commentsLoaded, setCommentsLoaded] = useState(false);
   
+  // Passed to the blog/comment card --> if card deleted will change to true and trigger useEffect
   const [deletion, setDeletion] = useState(false);
 
   // Fetches Blog data from database  
@@ -46,7 +50,7 @@ const posts = () => {
       setBlogData(data);
 
     } catch (err: any) {
-      console.error('Fetch error:', err.message);
+      console.error('Fetch error | Fetching Blogs:', err.message);
       setError('An unexpected error occurred');
     } finally {
       setBlogsLoaded(true);
@@ -61,25 +65,25 @@ const posts = () => {
       setCommentData(data);
 
     } catch (err: any) {
-      console.error('Fetch error:', err.message);
+      console.error('Fetch error | Fetching Comments:', err.message);
       setError('An unexpected error occurred');
     }  finally {
       setCommentsLoaded(true);
     }
   }
 
+  // Fetches all data 
   useEffect(() => {
     const fetchAll = async () => {
       await Promise.all([fetchBlogs(), fetchComments()]);
       setDeletion(false)
       setBlogEdit(false)
       setCommentEdit(false);
-      // console.log("fetched all!")
     };
 
     fetchAll();
   }, [user, refreshing, deletion]);
-    
+
   return (
 
     <View className="flex-1 bg-dark-100">
@@ -96,8 +100,8 @@ const posts = () => {
           }}
           className='pb-[250px]'
           refreshControl={
+            // Refresh ability  
             <RefreshControl refreshing={refreshing} onRefresh={() => {
-              // console.log("refreshed!")
               fetchBlogs();
               fetchComments();
             }}
@@ -121,10 +125,25 @@ const posts = () => {
               </>
             ) : (
               <>
+
+                {/* Create new blog section */}
+                <View className='self-center justify-center items-center border border-transparent rounded-xl bg-dark-100 w-[94%] mt-8 flex-row py-4'>
+
+                  <Text className='relative right-20' size='xl' color='$white' bold={true} >Create New Post</Text>
+
+                  <Button borderRadius={50} bgColor='#008B8B' className='relative left-20' onPressIn={haptic()} onPress={() => {router.push('/blog/create')}}>
+                    <ButtonIcon as={AddIcon} />
+                  </Button>
+
+                </View>
+
+                {/* User's blogs section */}
                 <View className='self-center justify-center items-center border border-transparent rounded-xl bg-dark-100 w-[94%] mt-8 pb-8'>
 
                   <Text className='mt-5 ml-5 mb-4 self-start' size='2xl' color='$white' bold={true} >Your Blogs</Text>
-                  <Button size="md" className="rounded-full p-3.5 self-end absolute top-3 right-4" bgColor={blogEdit ? '#228B22' : '#91A3B6'} borderRadius={500} onPress={() => {toggleBlogEdit()}}>
+
+                  {/* Edit/Delete blogs */}
+                  <Button size="md" className="rounded-full p-3.5 self-end absolute top-3 right-4" bgColor={blogEdit ? '#228B22' : '#91A3B6'} borderRadius={500} onPressIn={haptic()} onPress={() => {toggleBlogEdit()}}>
                     <ButtonIcon as={EditIcon} />
                     <Text color='$white' size='sm'> Edit</Text>
                   </Button>
@@ -146,10 +165,13 @@ const posts = () => {
 
                 </View>
                 
+                {/* User's comment section */}
                 <View className='self-center justify-center items-center border border-transparent rounded-xl bg-dark-100 w-[94%] mt-8 pb-8'>
 
                   <Text className='mt-5 ml-5 mb-4 self-start' size='2xl' color='$white' bold={true} >Your Comments</Text>
-                  <Button size="md" className="rounded-full p-3.5 self-end absolute top-3 right-4" bgColor={commentEdit ? '#228B22' : '#91A3B6'} borderRadius={500} onPress={() => {toggleCommentEdit()}}>
+
+                  {/* Edit/Delete comments */}
+                  <Button size="md" className="rounded-full p-3.5 self-end absolute top-3 right-4" bgColor={commentEdit ? '#228B22' : '#91A3B6'} borderRadius={500} onPressIn={haptic()} onPress={() => {toggleCommentEdit()}}>
                     <ButtonIcon as={EditIcon} />
                     <Text color='$white' size='sm'> Edit</Text>
                   </Button>
@@ -167,7 +189,6 @@ const posts = () => {
                         ))
                       )}
                     </View>
-
                 </View>
               </>
           )}

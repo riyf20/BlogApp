@@ -1,27 +1,28 @@
-import { View, Text, ScrollView, FlatList, ActivityIndicator, Platform, Keyboard } from 'react-native'
 import React, { useEffect, useState } from 'react'
+import { View, Text, ScrollView, FlatList, ActivityIndicator, Platform, Keyboard } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import useFetch from '@/services/useFetch';
-import PictureCard from '@/components/PictureCard';
 import { AlertCircleIcon, Button, ButtonIcon, ChevronLeftIcon, 
   Divider, FormControl, FormControlError, FormControlErrorIcon, 
   FormControlErrorText, Input, InputField } from '@gluestack-ui/themed';
-import { useAuthStore } from '@/utils/authStore';
-import { fetchComments, sendComment } from '@/services/auth';
-import CommentSection from '@/components/CommentSection';
-import TextTicker from "react-native-text-ticker";
-import Animated, { Easing, FadeInRight, FadeInUp, useAnimatedStyle, 
+import Animated, { Easing, FadeInUp, useAnimatedStyle, 
   useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
-
+import TextTicker from "react-native-text-ticker";
+import useFetch from '@/services/useFetch';
+import { fetchComments, sendComment } from '@/services/auth';
+import PictureCard from '@/components/PictureCard';
+import CommentSection from '@/components/CommentSection';
+import { useAuthStore } from '@/utils/authStore';
+import { useHapticFeedback } from '@/components/HapticTab';
 
 const BlogDetails = () => {
 
+  // For navigation
   const router = useRouter();
 
+  // Persisted data
   const {token, username} = useAuthStore();
 
-
-  // Grabs id 
+  // Grabs id --> changes type
   const {id} = useLocalSearchParams();
   const numId = Number(id);
 
@@ -30,11 +31,6 @@ const BlogDetails = () => {
   const {data: imgs, isLoading: imgsLoading, error:imgsError} = useFetch<Picture[]>(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/${id}/images`); 
 
   const [hasimages, setHasImages] = useState(false);  // Blog post => Images
-  // const [images, setImages] = useState([]);  // Array of blog's images
-  // const [initialImages, setInitialImages] = useState([]);  // Initial set of images 
-  // const [imageLoaded, setImageLoaded] = useState(false);  // Image render 
-
-
   const [comments, setComments] = useState([]);  // Blog post loaded => Load Comments
 
   // Translation for comment field 
@@ -45,20 +41,25 @@ const BlogDetails = () => {
     transform: [{ translateY: translateY.value+10 }],
   }))
 
-  // If enter was pressed
+  // If user pressed into comment field
   const [enter, setEnter] = useState(false);
 
   // Comment field | validity state | error
   const [commentField, setCommentField] = useState('')
   const [commentInvalid, setCommentInvalid] = useState(false);
   const [commentError, setCommentError] = useState("")
+
+  // Buttons haptics
+  const haptic = useHapticFeedback();
   
+  // Fetchs comments once blog is loaded
   useEffect(() => {
     if (blog) {
       fetchAllComments();
     }
   }, [blog, id, hasimages]);
 
+  // Fetches all comments
   const fetchAllComments = async () => {
     setComments([])
     try {
@@ -66,12 +67,14 @@ const BlogDetails = () => {
 
       setComments(data)
     } catch (err:any) {
-      console.error("Error occured: ", err.message)
+      console.error("Error occured | Fetching Comments:", err.message)
     }
   }
 
-  // Translate field up or down based on keyboard
+  // Moves comment field based on keyboard 
   useEffect(() => {
+
+    // Moves field up above keyboard
     const showSub = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
       (e) => {
@@ -79,6 +82,8 @@ const BlogDetails = () => {
         setEnter(true)
       }
     );
+
+    // Moves field down (resets to original position)
     const hideSub = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
       () => {
@@ -94,10 +99,9 @@ const BlogDetails = () => {
   }, []);
 
 
-  // Comment entered 
+  // Submit new comment to backend
   const handleComment = async () => {
-    Keyboard.dismiss();
-
+    
     // Checks if field is empty
     if(!commentField.trim()) {
       setCommentInvalid(true)
@@ -105,6 +109,9 @@ const BlogDetails = () => {
       return
     }
 
+    // Closes keyboard
+    Keyboard.dismiss();
+    
     try {
 
       // Send comment to backend
@@ -115,7 +122,7 @@ const BlogDetails = () => {
       fetchAllComments();
 
     } catch (err:any) {
-      console.error("Comment Failed: ", err.message)
+      console.error("Error occured | Comment Failed:", err.message)
       
     }
   }
@@ -125,15 +132,15 @@ const BlogDetails = () => {
     // Acts as header and will show blog's title
     <View className='flex-1 bg-dark-100'>
       <View className="justify-center items-center self-center flex-row mt-20 mb- w-[80%] ml-14">
+
+        {/* Moving title for lengthy titles */}
         <TextTicker
-        className='w-auto'
-        loop
-        bounce={false}
-        repeatSpacer={50}
-        // Delay before starting
-        marqueeDelay={1000}
-        // Time to scroll across
-        duration={10000}  
+          className='w-auto'
+          loop
+          bounce={false}
+          repeatSpacer={50}
+          marqueeDelay={1000}     // Delay before starting
+          duration={10000}        // Time to scroll across
         >
           <Text className="text-3xl text-light-100 font-bold" numberOfLines={1} >{isLoading ? 'Loading...' : blog?.title } </Text>
         </TextTicker>
@@ -174,7 +181,7 @@ const BlogDetails = () => {
             {blog?.body}
           </Text>
 
-          {/* Conditionally renders images */}
+          {/* Conditionally renders images if any */}
           { imgsLoading ? (
               <>
                 <ActivityIndicator size="small" color="#008B8B" />
@@ -209,6 +216,7 @@ const BlogDetails = () => {
         
         )}
         
+        {/* Comment section */}
         <Divider height={8} width={'94%'} className='self-center' borderRadius={20} bgColor="#2F4858"/>
         <ScrollView >
           <View className='pb-[250px]'>
@@ -230,9 +238,11 @@ const BlogDetails = () => {
  
       </View>
 
+        {/* Comment field */}
         <Animated.View style={[animatedStyles]} className='absolute bottom-0 left-0 right-0 z-50'>
 
           {enter ? 
+          // Moves comment field up above keyboard --> adds comment button to submit comment
           <>
             <View className="bg-dark-100 w-full p-4 border-t border-gray-700 pb-32 top-20 flex-row gap-2">
               <FormControl isInvalid={commentInvalid} className='w-[74%]'>
@@ -252,6 +262,14 @@ const BlogDetails = () => {
                   />
                 </Input>
 
+                {/* Shows error for comment field */}
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    {commentError}
+                  </FormControlErrorText>
+                </FormControlError>
+
               </FormControl>
             
               <Animated.View 
@@ -265,7 +283,7 @@ const BlogDetails = () => {
                 }
               >
                   <View>
-                    <Button size="sm" variant="solid" action="positive" className="top-[1px]" borderRadius={100} onPress={handleComment}>
+                    <Button size="sm" variant="solid" action="positive" className="top-[1px]" borderRadius={100} onPressIn={haptic} onPress={handleComment}>
                       <Text className="font-bold text-lg text-white">Comment</Text>
                     </Button>
                   </View>
@@ -273,6 +291,7 @@ const BlogDetails = () => {
             </View>
           </>
           :
+          // Else basic comment field at the bottom
           <>
             <View className="bg-dark-100 w-full p-4 border-t border-gray-700 pb-32 top-20 flex-1">
               
@@ -294,6 +313,7 @@ const BlogDetails = () => {
                  
                 </Input>
 
+                {/* Shows error for comment field */}
                 <FormControlError>
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
@@ -305,8 +325,6 @@ const BlogDetails = () => {
             </View>
           </>
           }
-
-
       </Animated.View>
 
     </View>

@@ -3,20 +3,23 @@ import React, { useState } from 'react'
 import { AlertCircleIcon, Button, Divider, 
   FormControl, FormControlError, FormControlErrorIcon, 
   FormControlErrorText, Heading,Text } from '@gluestack-ui/themed'
-import FormInput from '@/components/FormInput';
 import { useRouter } from 'expo-router';
 import { loginUser, signupUser } from '@/services/auth';
 import { useAuthStore } from '@/utils/authStore'
 import { scheduleTokenRefresh } from '@/utils/authUtils';
+import FormInput from '@/components/FormInput';
+import { useHapticFeedback as haptic} from '@/components/HapticTab';
 
 
 
 const signUp = () => {
 
+  // For navigation
   const router = useRouter();
+
+  // Persisted Data
   const {logIn} = useAuthStore();
   
-
   // Valid state for the main parent form (FormControl)
   const [invalid, setInvalid] = useState(false);
 
@@ -151,7 +154,7 @@ const signUp = () => {
         }
 
         <Button 
-            size="md" variant="solid" bg='#47a7a7' onPress={handleSignUp} 
+            size="md" variant="solid" bg='#47a7a7' onPress={handleSignUp} onPressIn={haptic()}
         >
           <Text className="font-bold text-xl" color='$white' size='lg'>Sign Up</Text>
         </Button>
@@ -162,7 +165,6 @@ const signUp = () => {
 
         <View className='self-center'>
             <Pressable onPress={() => router.back()}> 
-              {/* router.back() | router.push('/sign-in')*/}
                 <Text color='$white'>Already have an account? <Text color='$white' underline={true}>Log in</Text></Text>
             </Pressable>
         </View>

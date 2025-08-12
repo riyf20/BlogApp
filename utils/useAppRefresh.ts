@@ -3,7 +3,8 @@ import { useEffect, useRef } from 'react';
 import { useAuthStore } from './authStore';
 import { refreshToken } from './authUtils';
 
-const debug = true
+// Logging for production testing
+const debug = false;
 
 export const useAppRefresh = () => {
   const appState = useRef(AppState.currentState);
