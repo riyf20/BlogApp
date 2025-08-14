@@ -9,7 +9,6 @@ import Animated, { Easing, FadeInUp, useAnimatedStyle,
 import TextTicker from "react-native-text-ticker";
 import useFetch from '@/services/useFetch';
 import { fetchComments, sendComment } from '@/services/auth';
-import PictureCard from '@/components/PictureCard';
 import { useAuthStore } from '@/utils/authStore';
 import { useHapticFeedback } from '@/components/HapticTab';
 import Bottom from '@/components/Bottom';

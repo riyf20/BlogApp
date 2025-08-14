@@ -87,7 +87,7 @@ const InfoModal = ({showModal, setShowModal, heading, body, buttonText, parent, 
                             >
                                 <ButtonText>{buttonText}</ButtonText>
                             </Button>
-                        : parent==='image' ?
+                        : parent==='image' || parent==='post' ?
                             <Button
                             onPressIn={haptic()}
                             onPress={confirmFunction}

@@ -125,11 +125,13 @@ interface CommentSectionProps extends usersComment {
 interface BlogCardProps extends Blog {
     index: number;
     edit: boolean;
-    deletion?: (booleon: any) => void;
+    setIndex?: (number:any) => void;
+    type?: (type:string) => void;    
 }
 
 interface CommentCardProps extends usersComment {
     index: number;
     edit: boolean;
-    deletion?: (booleon: any) => void;
+    setIndex?: (number:any) => void;
+    type?: (type:string) => void;        
 }

@@ -3,14 +3,10 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import Animated, { FadeInDown, FadeInRight, ReduceMotion } from 'react-native-reanimated';
 import { Button, ButtonIcon, TrashIcon } from '@gluestack-ui/themed';
 import { Link } from 'expo-router'
-import { useAuthStore } from '@/utils/authStore';
-import { deleteComment } from '@/services/auth';
 
-const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, deletion }: CommentCardProps) => {
 
-    // Persisted data
-    const {token, username} = useAuthStore()
-    
+const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, setIndex, type }: CommentCardProps) => {
+
     // Changes date format
     const formatDate = (isoString: string): string => {
         const date = new Date(isoString);
@@ -22,14 +18,8 @@ const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, dele
 
     // Deletes specific comment
     const handleDelete = async () => {
- 
-        try {
-            const data = await deleteComment(username, postid, commentId, token)
-        } catch (error:any) {
-            console.error("Error occured | Deleting comment", error.message)
-        }
-        deletion?.(true);
-        
+        setIndex!(index)
+        type!('comment') 
     }
         
   return (

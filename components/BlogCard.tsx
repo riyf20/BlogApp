@@ -3,25 +3,15 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import Animated, {FadeInDown, ReduceMotion, FadeInRight } from 'react-native-reanimated';
 import { Button, ButtonIcon, TrashIcon } from '@gluestack-ui/themed';
 import { Link } from 'expo-router'
-import { useAuthStore } from '@/utils/authStore';
-import { deleteBlog } from '@/services/auth';
 
 
-const BlogCard = ({ title, id, author, index, edit, deletion }: BlogCardProps) => {
+const BlogCard = ({ title, id, author, index, edit, setIndex, type }: BlogCardProps) => {
 
-    // Persisted data
-    const {token, username} = useAuthStore()
 
     // Deletes specific blog
     const handleDelete = async () => {
-
-        try {
-            const data = await deleteBlog(id, token, username)
-        } catch (error:any) {
-            console.error("Error occured | Deleting blog", error.message)
-        }
-        deletion?.(true);
-        
+        setIndex!(index)
+        type!('blog')
     }
         
   return (

@@ -3,10 +3,11 @@ import { RefreshControl, ScrollView, View } from 'react-native'
 import { router } from 'expo-router';
 import {AddIcon, Button, ButtonIcon, Divider, EditIcon, Text } from '@gluestack-ui/themed';
 import { useAuthStore } from '@/utils/authStore'
-import { userBlogData, userCommentData } from '@/services/auth';
+import { deleteBlog, deleteComment, userBlogData, userCommentData } from '@/services/auth';
 import BlogCard from '@/components/BlogCard';
 import CommentCard from '@/components/CommentCard';
 import { useHapticFeedback as haptic } from '@/components/HapticTab';
+import InfoModal from '@/components/InfoModal';
 
 const posts = () => {
 
@@ -42,6 +43,67 @@ const posts = () => {
   // Passed to the blog/comment card --> if card deleted will change to true and trigger useEffect
   const [deletion, setDeletion] = useState(false);
 
+  // Dynamic modal to confirm actions
+  const [showModal, setShowModal] = useState(false);
+
+  // Modal components
+  const [heading, setHeading] = useState('');
+  const [body, setBody] = useState('');
+  const [buttonText, setButtonText] = useState('');
+  const [parent, setParent] = useState('');
+
+  // Index and type (blog/comment) of delete item
+  const [deleteIndex, setDeleteIndex] = useState(-1);
+  const [deleteType, setDeleteType] = useState('');
+
+  // Will trigger modal --> will only change if user clicked delete
+  useEffect(() => {
+    if (deleteIndex!==-1 && deleteType) {
+       setHeading('Delete ' + deleteType + '?')
+      setBody("Are you sure you want to delete this " + deleteType + "?")
+      setButtonText("Delete")
+      setParent('post')
+      setShowModal(true)
+    }
+   
+  }, [deleteIndex, deleteType])
+
+  // Delete based on index and type
+  const handleDelete = async () => {
+
+    // If its blog
+    if(deleteType==='blog') {
+      // Will get specific blog
+      const selectedBlog = blogData?.at(deleteIndex)
+      
+      try {
+        const data = await deleteBlog(selectedBlog!.id, token, username)
+      } catch (error:any) {
+        console.error("Error occured | Deleting blog", error.message)
+      }
+      setShowModal(false)
+      setDeletion(true);
+
+    } else if (deleteType==='comment') {
+      // If its comment
+
+      // Will get specific comment
+      const selectedComment = commentData?.at(deleteIndex);
+
+      try {
+        const data = await deleteComment(username, selectedComment!.postid, selectedComment!.id, token)
+      } catch (error:any) {
+        console.error("Error occured | Deleting comment", error.message)
+      }
+
+      // Closes modal and refreshes data
+      setShowModal(false)
+      setDeletion(true);
+    }
+      
+  }
+  
+  
   // Fetches Blog data from database  
   const fetchBlogs = async () => {
     try {
@@ -158,7 +220,7 @@ const posts = () => {
                         </Text>
                       ) : (
                         blogData?.map((item:Blog, index) => (
-                          <BlogCard key={item.id} {...item} index={index} edit={blogEdit} deletion={setDeletion}/>
+                          <BlogCard key={item.id} {...item} index={index} edit={blogEdit} setIndex={setDeleteIndex} type={setDeleteType}/>
                         ))
                       )}
                     </View>
@@ -185,7 +247,7 @@ const posts = () => {
                         </Text>
                       ) : (
                         commentData?.map((comment: usersComment, index) => (
-                          <CommentCard key={comment.id} {...comment} index={index} edit={commentEdit} deletion={setDeletion}/>
+                          <CommentCard key={comment.id} {...comment} index={index} edit={commentEdit} setIndex={setDeleteIndex} type={setDeleteType}/>
                         ))
                       )}
                     </View>
@@ -197,6 +259,9 @@ const posts = () => {
 
         </ScrollView>
       </View>
+
+      <InfoModal showModal={showModal} setShowModal={setShowModal} heading={heading} body={body} buttonText={buttonText} parent={parent} confirmFunction={handleDelete}/>
+    
     </View>
   )
 }

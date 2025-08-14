@@ -1,13 +1,10 @@
 import { Image, Pressable } from 'react-native'
 import React from 'react'
 
-
-
 const ImageCard = ({ uri, onPress, onLongPress, index, parent}: ImageCardProps) => {
   
   if (parent==='blogFallback') {
     uri = `data:image/jpeg;base64,${uri}`
-    console.log("FALLBACK")
   }
 
   return (
