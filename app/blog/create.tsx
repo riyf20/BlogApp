@@ -84,17 +84,15 @@ const create = () => {
       if(images.length > 0) {
         try {
           await Promise.all(
-            images.map(image => {
-
-              // Removes 'data:image64' as the backend handles that
-              let base64Data = image.base64;
-              if (base64Data.startsWith("data:image")) {
-                base64Data = base64Data.split(",")[1];
-              }
-              postImage(newBlogId, username, base64Data, token)
-
+            
+            images.map(({ base64, fileUri }) => {
+              const cleanBase64 = base64.startsWith("data:image")
+                ? base64.split(",")[1]
+                : base64;
+                
+              return postImage(newBlogId, username, cleanBase64, token, fileUri);
             })
-        );
+          );
         } catch (err:any) {
           console.error("Error occured | Image posting: ", err.message)
         }

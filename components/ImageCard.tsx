@@ -4,7 +4,12 @@ import React from 'react'
 
 
 const ImageCard = ({ uri, onPress, onLongPress, index, parent}: ImageCardProps) => {
-    
+  
+  if (parent==='blogFallback') {
+    uri = `data:image/jpeg;base64,${uri}`
+    console.log("FALLBACK")
+  }
+
   return (
    <Pressable onPress={() => {onPress(index)}} style={{ marginRight: 8 }} onLongPress={() => {onLongPress(index)}}>
     <Image
@@ -26,6 +31,7 @@ const ImageCard = ({ uri, onPress, onLongPress, index, parent}: ImageCardProps) 
               borderRadius: 8,
             }
         :
+        // blog will use this style as well
             {
               width: 200,
               height: 250,

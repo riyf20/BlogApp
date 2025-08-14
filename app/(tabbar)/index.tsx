@@ -66,12 +66,12 @@ export default function Index() {
                 </View>
               </>
             ) : (
-              <>
+              <View className="pb-[300px]">
                 {/* Maps blogs and renders a card for each */}
                 {blogs?.map((item:Blog, index) => (
                   <BlogCard key={item.id} {...item} index={index} edit={false}/>
                 ))}
-              </>
+              </View>
             )}
 
           </View>

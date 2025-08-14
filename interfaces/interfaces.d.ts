@@ -14,6 +14,7 @@ interface Picture {
     id: number;
     created_at: string;
     updated_at: string;
+    fileUrl: string;
 }
 
 interface User {

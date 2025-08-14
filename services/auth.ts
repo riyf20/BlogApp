@@ -224,7 +224,7 @@ export const postBlog = async (author:string, token:string, title:string, body:s
 };
 
 // Posts images for new blog
-export const postImage = async (blogId:number, blogAuthor:string, imageBlob:any, token:string,) => {
+export const postImage = async (blogId:number, blogAuthor:string, imageBlob:any, token:string, fileUri:string) => {
 
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/images/upload`, {
     method: 'POST',
@@ -232,7 +232,7 @@ export const postImage = async (blogId:number, blogAuthor:string, imageBlob:any,
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`
     },
-    body: JSON.stringify({ blogId, blogAuthor, imageBlob })
+    body: JSON.stringify({ blogId, blogAuthor, imageBlob, fileUri })
   })
   const data = await response.json();
 

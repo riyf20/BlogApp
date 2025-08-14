@@ -14,6 +14,9 @@ import { useAuthStore } from '@/utils/authStore';
 import { useHapticFeedback } from '@/components/HapticTab';
 import Bottom from '@/components/Bottom';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import ImageCard from '@/components/ImageCard';
+import ImageView from "react-native-image-viewing";
+
 
 
 const BlogDetails = () => {
@@ -135,6 +138,19 @@ const BlogDetails = () => {
     }
   }
 
+  const [visible, setIsVisible] = useState(false);
+  const [imgIndex, setImgIndex] = useState(-1)
+
+  // Function that sets up to show enlarged picture
+  const imgPress = (index:number) => {
+    setImgIndex(index);
+    setIsVisible(true);
+  }
+  // Function that sets up to show enlarged picture | future update 
+  const imgLongPress = (index:number) => {
+    haptic()
+  }
+
   return (
 
       <GestureHandlerRootView>
@@ -203,21 +219,37 @@ const BlogDetails = () => {
                 </>
               ) : imgs && imgs.length > 0 ? (
                 <View>
-                  <FlatList
-                    data={imgs}
-                    horizontal
-                    renderItem={({ item }) => <PictureCard {...item} />}
-                    keyExtractor={(item) => item.id.toString()}
-                    showsHorizontalScrollIndicator={false}
-                    ItemSeparatorComponent={() => <View style={{ width: 10 }} />}
-                    style={{ height: 300, marginHorizontal: 16, marginBottom: -20 }}
-                  />
+                  <ScrollView 
+                      horizontal={true}
+                      contentContainerStyle={{
+                          paddingHorizontal: 8,
+                          gap: 8,
+                          alignItems: 'center',
+                          justifyContent: 'flex-start',
+                      }}
+                      showsHorizontalScrollIndicator={false}
+                  >
+                      {/* Imagecard renders each individual image */}
+                      {imgs.map((img, index) => (
+                          <ImageCard key={index} uri={img.fileUrl ? img.fileUrl : img.image_blob} index={index} onPress={imgPress} onLongPress={imgLongPress} parent={img.fileUrl ? 'blog' : 'blogFallback'}/> 
+                      ))}
+
+                      {/* This is used to show an enlarged version of a specified image */}
+                      <ImageView
+                          images={imgs.map(img => ({ uri: img.fileUrl ? img.fileUrl : `data:image/jpeg;base64,${img.image_blob}` }))}
+                          imageIndex={imgIndex}
+                          visible={visible}
+                          onRequestClose={() => setIsVisible(false)}
+                          presentationStyle="overFullScreen"
+                          backgroundColor="dimgray"
+                      />
+                  </ScrollView>
                 </View>
               ) : null 
             }
             
 
-            <View className='mt-[-20px]'>
+            <View className=''>
               <Text className='m-4'>
                 Written by: {blog?.author}
               </Text>
