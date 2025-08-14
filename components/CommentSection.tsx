@@ -3,9 +3,9 @@ import React from 'react'
 
 const CommentSection = ({body, author, index}:CommentSectionProps) => {
   return (
-    <View className='ml-4' id={index.toString()}>
-      <Text className='text-lg font-semibold'>{author}</Text>
-      <Text className='ml-2 mb-2'>{body}</Text>
+    <View className='mb-4 ml-2' id={index.toString()}>
+      <Text className='text-xl font-semibold'>{author}</Text>
+      <Text className='ml-4'>{body}</Text>
     </View>
   )
 }

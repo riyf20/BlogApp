@@ -198,7 +198,7 @@ const create = () => {
         </ScrollView>
         
         {/* Bottom sheet component */}
-        <Bottom ref={bottomRef} images={images} setImages={setImages} />
+        <Bottom ref={bottomRef} images={images} setImages={setImages} parent={'create'}/>
         
       </View>
       

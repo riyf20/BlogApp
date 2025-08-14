@@ -77,12 +77,17 @@ interface ProfileInputProps {
 }
 
 interface BottomProps {
-    images: ImageItem[];
-    setImages: (args0: any) => void;
+    images?: ImageItem[];
+    setImages?: (args0: any) => void;
+    parent:string,
+    comments?: usersComment[]
+    keyboard?: Boolean
 }
 
 interface BottomSheetHandle {
     open: () => void;
+    commentUp: () => void;
+    commentDown: () => void;
     close: () => void;
 }
 
