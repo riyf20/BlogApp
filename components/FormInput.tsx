@@ -20,10 +20,11 @@ import { FormControl, Input, InputField,
 //     setParentInvalid: (arg0: boolean) => void,          // Function to change the parent component's valid state
 //     error:string                                        // Any error message
 //     textarea?:boolean                                   // Optional: textarea input
+//     parent?:string                                      // Optional: parent --> comment page, show error
 // };
 
 
-const FormInput = ({invalid, placeholder, value, parentInvalid, setValue, setValueInvalid, setParentInvalid, error, textarea}: FormInputProps) => {
+const FormInput = ({invalid, placeholder, value, parentInvalid, setValue, setValueInvalid, setParentInvalid, error, textarea, parent}: FormInputProps) => {
 
     // Used for password inputs
     const [showPassword, setShowPassword] = useState(false);
@@ -50,7 +51,16 @@ const FormInput = ({invalid, placeholder, value, parentInvalid, setValue, setVal
                             setParentInvalid(false); 
                         }}
                     />   
-                </Textarea>            
+                </Textarea> 
+
+                {invalid && parent==='comment' &&
+                    <FormControlError>
+                        <FormControlErrorIcon as={AlertCircleIcon} />
+                        <FormControlErrorText>
+                            {error}
+                        </FormControlErrorText>
+                    </FormControlError>
+                }          
             </>
         :
             <>

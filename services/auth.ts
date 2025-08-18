@@ -3,10 +3,11 @@ import { setItem } from "expo-secure-store";
 
 // Logs user in
 export const loginUser = async (username: string, password: string) => {
+  const type="app";
   const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ username, password, type }),
   });
 
   const data = await response.json();
@@ -240,3 +241,41 @@ export const postImage = async (blogId:number, blogAuthor:string, imageBlob:any,
   return data;
 
 };
+
+// Updates comment
+export const updateComment = async (postid:number, id:number, comment:string, token:string) => {
+
+  const editCommentBody = comment
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/${postid}/${id}/update`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({editCommentBody})
+  })
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.message || 'Failed to update comment');
+  return data;
+
+};
+
+// Reports comment
+export const reportComment = async (userId:number, username:string, postid:number, id:number, token:string) => {
+
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/${postid}/${id}/report`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({userId, username})
+  })
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.message || 'Failed to report comment');
+  return data;
+
+};
+

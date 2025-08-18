@@ -68,6 +68,13 @@ const posts = () => {
    
   }, [deleteIndex, deleteType])
 
+  useEffect(() => {
+    if(!showModal) {
+      setDeleteIndex(-1)
+      setDeleteType('')
+    }
+  }, [showModal])
+
   // Delete based on index and type
   const handleDelete = async () => {
 

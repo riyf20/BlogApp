@@ -83,6 +83,7 @@ interface BottomProps {
     parent:string,
     comments?: usersComment[]
     keyboard?: Boolean
+    fetchComments?: () => void;
 }
 
 interface BottomSheetHandle {
@@ -102,6 +103,7 @@ interface FormInputProps {
     setParentInvalid: (arg0: boolean) => void;
     error: string;
     textarea?: boolean;
+    parent?:string;
 }
 
 interface ImageCardProps {
@@ -118,8 +120,17 @@ interface ImageUploaderProps {
     setClose: () => void;
 }
 
+
+interface ToastNotifProps {
+    title:string
+    message:string
+    show:boolean
+    setShow: (boolean) => void;
+}
+
 interface CommentSectionProps extends usersComment {
     index: number;
+    fetchComments?: () => void;
 }
 
 interface BlogCardProps extends Blog {

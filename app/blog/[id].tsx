@@ -261,7 +261,7 @@ const BlogDetails = () => {
           <Divider height={8} width={'94%'} className='self-center' borderRadius={20} bgColor="#2F4858"/>
           
           {/* Bottom Sheet Comment Section */}
-          <Bottom ref={bottomRef} parent='comments' comments={comments} keyboard={enter}/>
+          <Bottom ref={bottomRef} parent='comments' comments={comments} keyboard={enter} fetchComments={fetchAllComments}/>
           
         </View>
 

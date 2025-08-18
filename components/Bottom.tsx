@@ -5,7 +5,7 @@ import {Dimensions, Text, View} from 'react-native'
 import CommentSection from './CommentSection';
 import { runOnJS, useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
-const Bottom =  forwardRef<BottomSheetHandle, BottomProps>(({ images, setImages, parent, comments, keyboard }, ref) => {
+const Bottom =  forwardRef<BottomSheetHandle, BottomProps>(({ images, setImages, parent, comments, keyboard, fetchComments }, ref) => {
   
   // Reference so it can connect to parent
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -124,7 +124,7 @@ const Bottom =  forwardRef<BottomSheetHandle, BottomProps>(({ images, setImages,
                     }}
                   >
                    {comments?.map((comment:usersComment, index) => (
-                      <CommentSection key={comment.id} {...comment} index={index}/>
+                      <CommentSection key={comment.id} {...comment} index={index} fetchComments={fetchComments}/>
                     ))} 
 
                   </BottomSheetScrollView>
