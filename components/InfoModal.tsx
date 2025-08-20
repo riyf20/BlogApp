@@ -20,7 +20,7 @@ const InfoModal = ({showModal, setShowModal, heading, body, buttonText, parent, 
         }}
         size="lg"
         // Disables close on create as it is posting the blog
-        closeOnOverlayClick={parent==='create' ? false : true}
+        closeOnOverlayClick={(parent!=='create' && parent!=='createEdit') ? true : false}
     >
         <ModalBackdrop />
 
@@ -30,14 +30,16 @@ const InfoModal = ({showModal, setShowModal, heading, body, buttonText, parent, 
                     {heading}
                 </Heading>
                 
-                <ModalCloseButton>
-                    <Icon
-                        as={CloseIcon}
-                        size="md"
-                        className="stroke-background-400 group-[:hover]/modal-close-button:stroke-background-700 
-                        group-[:active]/modal-close-button:stroke-background-900 group-[:focus-visible]/modal-close-button:stroke-background-900"
-                    />
-                </ModalCloseButton>
+                {(parent!=='create' && parent!=='createEdit') && 
+                    <ModalCloseButton>
+                        <Icon
+                            as={CloseIcon}
+                            size="md"
+                            className="stroke-background-400 group-[:hover]/modal-close-button:stroke-background-700 
+                            group-[:active]/modal-close-button:stroke-background-900 group-[:focus-visible]/modal-close-button:stroke-background-900"
+                        />
+                    </ModalCloseButton>
+                }
             </ModalHeader>
 
             <ModalBody>
@@ -53,8 +55,8 @@ const InfoModal = ({showModal, setShowModal, heading, body, buttonText, parent, 
                 )}
 
                 {/* Will render a loading icon is called from create */}
-                {parent==='create' &&
-                <ActivityIndicator size={'large'} className='justify-center mt-6'/>
+                { (parent==='create' || parent==='createEdit') &&
+                    <ActivityIndicator size={'large'} className='justify-center mt-6'/>
                 }
 
             </ModalBody>
@@ -62,7 +64,7 @@ const InfoModal = ({showModal, setShowModal, heading, body, buttonText, parent, 
             <ModalFooter className='gap-2'>
 
                 {/* Will render no buttons for create */}
-                {parent!=='create' && 
+                { (parent!=='create' && parent!=='createEdit') && 
 
                     <>
                         {/* Cancel button | Different color based on profile page or not */}
@@ -87,7 +89,7 @@ const InfoModal = ({showModal, setShowModal, heading, body, buttonText, parent, 
                             >
                                 <ButtonText>{buttonText}</ButtonText>
                             </Button>
-                        : parent==='image' || parent==='post' || parent==='comment' || parent==='commentUnsaved' || parent==='commentReport'?
+                        : parent==='image' || parent==='post' || parent==='commentDelete' || parent==='blogDelete' || parent==='commentUnsaved' || parent==='commentReport' || parent==='blogReport' || parent==='createUnsaved' ?
                             <Button
                             onPressIn={haptic()}
                             onPress={confirmFunction}

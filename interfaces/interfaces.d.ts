@@ -54,6 +54,7 @@ interface usersComment {
 interface ImageItem {
     fileUri: string;
     base64: string;
+    id?:number
 }
 
 interface InfoModal {
@@ -120,12 +121,22 @@ interface ImageUploaderProps {
     setClose: () => void;
 }
 
-
 interface ToastNotifProps {
     title:string
     message:string
     show:boolean
     setShow: (boolean) => void;
+}
+
+interface UserActionSheetProps {
+    author:string,
+    body:string,
+    id:number,
+    parent:string,
+    title?:string,
+    index?:number, 
+    postid?:number
+    fetchComments?: () => void;
 }
 
 interface CommentSectionProps extends usersComment {

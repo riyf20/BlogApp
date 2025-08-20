@@ -279,3 +279,57 @@ export const reportComment = async (userId:number, username:string, postid:numbe
 
 };
 
+// Reports blog
+export const reportBlog = async (userId:number, username:string, id:number, token:string) => {
+
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/${id}/report`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({userId, username})
+  })
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.message || 'Failed to report blog');
+  return data;
+
+};
+
+
+// Updates blog
+export const updateBlog = async (token:string, title:string, body:string, editId:number) => {
+
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/${editId}/update`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({editBody:body, editTitle:title})
+  })
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.message || 'Failed to update blog');
+  return data;
+
+};
+
+// Deletes Image
+export const blogImageDelete = async (blogId:number, editedDeleteImages:any, token:string) => {
+
+  const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/${blogId}/images/delete`, {
+    method: 'DELETE',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({images: editedDeleteImages})
+  })
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.message || 'Failed to delete images');
+  return data;
+
+};

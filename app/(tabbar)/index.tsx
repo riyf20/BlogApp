@@ -4,6 +4,7 @@ import { images } from "@/constants/images";
 import useFetch from "@/services/useFetch";
 import BlogCard from "@/components/BlogCard";
 import { useAppRefresh } from "@/utils/useAppRefresh";
+import { useFocusEffect } from "expo-router";
 
 export default function Index() {
 
@@ -11,6 +12,13 @@ export default function Index() {
   const {data: blogs, isLoading, error, refetch: fetchData, reset} = useFetch<Blog[]>(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs`); 
 
   const [refreshing, setRefreshing] = useState(false);
+
+  // Refreshes data on page load
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, [])
+  );
 
   // Refreshes token 
   useAppRefresh();

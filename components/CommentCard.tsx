@@ -34,7 +34,7 @@ const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, setI
             {edit ? (
                 <View className="flex-row items-center justify-between mx-2 mt-4">
 
-                    <Link href={`/blog/${postid}`} asChild>
+                    <Link href={`/blog/${postid}?searchReferral=${true}`} asChild>
                         <TouchableOpacity className="flex-1 border border-black rounded-2xl mr-2 bg-white">
                             <Text className="text-lg text-primary font-bold mt-5 px-5">{body}</Text>
                             <Text className="text-lg text-secondary mb-3 px-5">Written {formatDate(updated_at)}</Text>
@@ -61,7 +61,7 @@ const CommentCard = ({ body, postid, updated_at, index, edit, id:commentId, setI
             ) : (
 
                 // Shows basic commentcard
-                <Link href={`/blog/${postid}`} asChild>
+                <Link href={`/blog/${postid}?searchReferral=${true}`} asChild>
                     <TouchableOpacity className="border border-black rounded-2xl mt-4 mx-2 bg-white">
                         <Text className="text-lg text-primary font-bold mt-5 px-5">{body}</Text>
                         <Text className="text-lg text-secondary mb-3 px-5">Written {formatDate(updated_at)}</Text>

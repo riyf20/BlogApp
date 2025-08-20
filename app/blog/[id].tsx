@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { View, Text, ScrollView, FlatList, ActivityIndicator, Platform, Keyboard } from 'react-native'
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { View, Text, ScrollView, ActivityIndicator, Platform, Keyboard } from 'react-native'
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { AlertCircleIcon, Button, ButtonIcon, ChevronLeftIcon, 
   Divider, FormControl, FormControlError, FormControlErrorIcon, 
   FormControlErrorText, Input, InputField } from '@gluestack-ui/themed';
@@ -15,10 +15,27 @@ import Bottom from '@/components/Bottom';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ImageCard from '@/components/ImageCard';
 import ImageView from "react-native-image-viewing";
+import UserActionSheet from '@/components/UserActionSheet';
 
 
 
 const BlogDetails = () => {
+
+  // Grabs id --> changes type
+  const {id, searchReferral} = useLocalSearchParams();
+  const numId = Number(id);
+
+  // Fetches blog details based on id 
+  const {data: blog, isLoading, error, refetch: fetchBlogData} = useFetch<Blog>(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/` + id); 
+  const {data: imgs, isLoading: imgsLoading, error:imgsError, refetch: fetchImageData} = useFetch<Picture[]>(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/${id}/images`); 
+
+  // Refreshes data on page load
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchBlogData();
+      fetchImageData();
+    }, [])
+  );
 
   // Reference to use functions for the bottom sheet | sends function backwards
   const bottomRef = useRef<BottomSheetHandle>(null);
@@ -28,14 +45,6 @@ const BlogDetails = () => {
 
   // Persisted data
   const {token, username} = useAuthStore();
-
-  // Grabs id --> changes type
-  const {id} = useLocalSearchParams();
-  const numId = Number(id);
-
-  // Fetches blog details based on id 
-  const {data: blog, isLoading, error} = useFetch<Blog>(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/` + id); 
-  const {data: imgs, isLoading: imgsLoading, error:imgsError} = useFetch<Picture[]>(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/blogs/${id}/images`); 
 
   const [hasimages, setHasImages] = useState(false);  // Blog post => Images
   const [comments, setComments] = useState([]);  // Blog post loaded => Load Comments
@@ -64,8 +73,13 @@ const BlogDetails = () => {
     if (blog) {
       fetchAllComments();
       bottomRef.current?.open();
+    
+      if (searchReferral) {
+        setTimeout(() => bottomRef.current?.commentUp(), 50);
+      }
     }
   }, [blog, id, hasimages]);
+
 
   // Fetches all comments
   const fetchAllComments = async () => {
@@ -156,7 +170,7 @@ const BlogDetails = () => {
 
       {/* // Acts as header and will show blog's title */}
       <View className='flex-1 bg-dark-100'>
-        <View className="justify-center items-center self-center flex-row mt-20 mb- w-[80%] ml-14">
+        <View className="justify-center items-center self-center flex-row mt-20 w-[78%] ml-14 mr-6 ">
 
           {/* Moving title for lengthy titles */}
           <TextTicker
@@ -169,9 +183,14 @@ const BlogDetails = () => {
           >
             <Text className="text-3xl text-light-100 font-bold" numberOfLines={1} >{isLoading ? 'Loading...' : blog?.title } </Text>
           </TextTicker>
+
+          {/* Icon for blog editing sheet: Edit, Delete, & report */}
+          {blog &&
+            <UserActionSheet author={blog.author} body={blog.body} id={blog.id} parent={'blog'} title={blog.title}/>
+          }
         </View>
         
-        <Button size="lg" className="rounded-full p-3.5 w-[5%] absolute top-[66px] left-4" bg='#91A3B6' borderRadius={50} onPress={() => router.back()}>
+        <Button size="lg" className="rounded-full p-3.5 w-[4%] absolute top-[66px] left-4" bg='#91A3B6' borderRadius={50} onPress={() => router.back()}>
           <ButtonIcon as={ChevronLeftIcon} size='xl' color='black' />
         </Button>
 

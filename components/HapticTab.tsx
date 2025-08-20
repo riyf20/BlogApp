@@ -19,6 +19,6 @@ export function HapticTab(props: BottomTabBarButtonProps) {
 // Soft haptic feedback for buttons/components
 export function useHapticFeedback() {
   return () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
   };
 }
